@@ -21,9 +21,19 @@ namespace NesEmulatorGUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Nes nes;
         public MainWindow()
         {
             InitializeComponent();
+            nes = new Nes();
+
+            Status.Text = nes.PrintCpu();
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            nes.Clock();
+            Status.Text = nes.PrintCpu();
         }
     }
 }
