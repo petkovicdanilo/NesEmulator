@@ -22,7 +22,7 @@ namespace NesLib.Devices
             UInt16 result = (UInt16)(A + data + (Status.CarryFlag ? 1 : 0));
 
             Status.CarryFlag = (result & (1 << 8)) != 0;
-            Status.ZeroFlag = result == 0;
+            UpdateZeroFlag((byte)result);
 
             byte accSign = (byte)(A & (1 << 7));
             byte dataSign = (byte)(data & (1 << 7));
@@ -51,8 +51,8 @@ namespace NesLib.Devices
 
             A &= data;
 
-            Status.ZeroFlag = (A == 0);
-            Status.NegativeFlag = (A & (1 << 7)) != 0;
+            UpdateZeroFlag(A);
+            UpdateNegativeFlag(A);
 
             return true;
         }
@@ -123,9 +123,9 @@ namespace NesLib.Devices
             byte data = Fetch();
             byte result = (byte)(A & data);
 
-            Status.ZeroFlag = (result == 0x00);
-            Status.OverflowFlag = (X & (1 << 6)) != 0;
-            Status.NegativeFlag = (X & (1 << 7)) != 0;
+            UpdateZeroFlag(result);
+            Status.OverflowFlag = (data & (1 << 6)) != 0;
+            UpdateNegativeFlag(data);
 
             return false;
         }
@@ -144,7 +144,7 @@ namespace NesLib.Devices
 
         // BNE - Branch if Not Equal
         [InstructionMethod(AddressingMode = AddressingMode.REL, Opcode = 0xD0, Cycles = 2)]
-        public bool BNE()
+        public bool BNE()   
         {
             if (!Status.ZeroFlag)
             {
@@ -175,8 +175,7 @@ namespace NesLib.Devices
             Status.UnusedFlag = true;
 
             // push PC to stack
-            StackPush((byte)((PC >> 8) & 0x00FF));
-            StackPush((byte)(PC & 0x00FF));
+            StackPushWord(PC);
 
             Status.BreakFlag = true;
             StackPush(Status.Register);
@@ -184,11 +183,8 @@ namespace NesLib.Devices
 
             UInt16 newPCAddress = 0xFFFE;
 
-            byte low = Read(newPCAddress);
-            byte high = Read((UInt16)(newPCAddress + 1));
-
-            PC = (UInt16)((high << 8) | low);
-
+            PC = ReadWord(newPCAddress);
+            
             return false;
         }
 
@@ -264,8 +260,8 @@ namespace NesLib.Devices
             byte result = (byte)(A - data);
 
             Status.CarryFlag = A >= data;
-            Status.ZeroFlag = result == 0;
-            Status.NegativeFlag = (result & (1 << 7)) != 0;
+            UpdateZeroFlag(result);
+            UpdateNegativeFlag(result);
 
             return true;
         }
@@ -281,9 +277,8 @@ namespace NesLib.Devices
             byte result = (byte)(X - data);
 
             Status.CarryFlag = X >= data;
-            Status.ZeroFlag = result == 0;
-
-            Status.NegativeFlag = (result & (1 << 7)) != 0;
+            UpdateZeroFlag(result);
+            UpdateNegativeFlag(result);
 
             return false;
         }
@@ -299,9 +294,8 @@ namespace NesLib.Devices
             byte result = (byte)(Y - data);
 
             Status.CarryFlag = Y >= data;
-            Status.ZeroFlag = result == 0;
-
-            Status.NegativeFlag = (result & (1 << 7)) != 0;
+            UpdateZeroFlag(result);
+            UpdateNegativeFlag(result);
 
             return false;
         }
@@ -319,8 +313,8 @@ namespace NesLib.Devices
 
             Write(address, data);
 
-            Status.ZeroFlag = data == 0;
-            Status.NegativeFlag = (data & (1 << 7)) != 0;
+            UpdateZeroFlag(data);
+            UpdateNegativeFlag(data);
 
             return false;
         }
@@ -331,8 +325,8 @@ namespace NesLib.Devices
         {
             X -= 1;
 
-            Status.ZeroFlag = X == 0;
-            Status.NegativeFlag = (X & (1 << 7)) != 0;
+            UpdateZeroFlag(X);
+            UpdateNegativeFlag(X);
 
             return false;
         }
@@ -343,8 +337,8 @@ namespace NesLib.Devices
         {
             Y -= 1;
 
-            Status.ZeroFlag = Y == 0;
-            Status.NegativeFlag = (Y & (1 << 7)) != 0;
+            UpdateZeroFlag(Y);
+            UpdateNegativeFlag(Y);
 
             return false;
         }
@@ -364,8 +358,8 @@ namespace NesLib.Devices
 
             A ^= data;
 
-            Status.ZeroFlag = A == 0;
-            Status.NegativeFlag = (A & (1 << 7)) != 0;
+            UpdateZeroFlag(A);
+            UpdateNegativeFlag(A);
 
             return true;
         }
@@ -383,8 +377,8 @@ namespace NesLib.Devices
 
             Write(address, data);
 
-            Status.ZeroFlag = data == 0;
-            Status.NegativeFlag = (data & (1 << 7)) != 0;
+            UpdateZeroFlag(data);
+            UpdateNegativeFlag(data);
 
             return false;
         }
@@ -395,8 +389,8 @@ namespace NesLib.Devices
         {
             X += 1;
 
-            Status.ZeroFlag = X == 0;
-            Status.NegativeFlag = (X & (1 << 7)) != 0;
+            UpdateZeroFlag(X);
+            UpdateNegativeFlag(X);
 
             return false;
         }
@@ -407,8 +401,8 @@ namespace NesLib.Devices
         {
             Y += 1;
 
-            Status.ZeroFlag = Y == 0;
-            Status.NegativeFlag = (Y & (1 << 7)) != 0;
+            UpdateZeroFlag(Y);
+            UpdateNegativeFlag(Y);
 
             return false;
         }
@@ -427,9 +421,7 @@ namespace NesLib.Devices
         public bool JSR()
         {
             PC--;
-
-            StackPush((byte)((PC >> 8) & 0x00FF));
-            StackPush((byte)(PC & 0x00FF));
+            StackPushWord(PC);
 
             PC = address;
 
@@ -451,8 +443,8 @@ namespace NesLib.Devices
 
             A = data;
 
-            Status.ZeroFlag = (A == 0);
-            Status.NegativeFlag = (A & (1 << 7)) != 0;
+            UpdateZeroFlag(A);
+            UpdateNegativeFlag(A);
 
             return true;
         }
@@ -465,12 +457,10 @@ namespace NesLib.Devices
         [InstructionMethod(AddressingMode = AddressingMode.ABY, Opcode = 0xBE, Cycles = 4)]
         public bool LDX()
         {
-            byte data = Fetch();
+            X = Fetch();
 
-            X = data;
-
-            Status.ZeroFlag = (X == 0);
-            Status.NegativeFlag = (X & (1 << 7)) != 0;
+            UpdateZeroFlag(X);
+            UpdateNegativeFlag(X);
 
             return true;
         }
@@ -483,12 +473,10 @@ namespace NesLib.Devices
         [InstructionMethod(AddressingMode = AddressingMode.ABX, Opcode = 0xBC, Cycles = 4)]
         public bool LDY()
         {
-            byte data = Fetch();
+            Y = Fetch();
 
-            X = data;
-
-            Status.ZeroFlag = (X == 0);
-            Status.NegativeFlag = (X & (1 << 7)) != 0;
+            UpdateZeroFlag(Y);
+            UpdateNegativeFlag(Y);
 
             return true;
         }
@@ -507,8 +495,8 @@ namespace NesLib.Devices
 
             byte result = (byte)(data >> 1);
 
-            Status.ZeroFlag = result == 0;
-            Status.NegativeFlag = (result & (1 << 7)) != 0;
+            UpdateZeroFlag(result);
+            UpdateNegativeFlag(result);
 
             if (operations[currentOpcode].Mode == AddressingMode.ACC)
             {
@@ -540,12 +528,10 @@ namespace NesLib.Devices
         [InstructionMethod(AddressingMode = AddressingMode.IZY, Opcode = 0x11, Cycles = 5)]
         public bool ORA()
         {
-            byte data = Fetch();
+            A |= Fetch();
 
-            A |= data;
-
-            Status.ZeroFlag = A == 0;
-            Status.NegativeFlag = (A & (1 << 7)) != 0;
+            UpdateZeroFlag(A);
+            UpdateNegativeFlag(A);
 
             return true;
         }
@@ -579,8 +565,8 @@ namespace NesLib.Devices
         {
             A = StackPop();
 
-            Status.ZeroFlag = A == 0;
-            Status.NegativeFlag = (A & (1 << 7)) != 0;
+            UpdateZeroFlag(A);
+            UpdateNegativeFlag(A);
 
             StackPointer++;
 
@@ -663,10 +649,7 @@ namespace NesLib.Devices
             Status.BreakFlag = false;
             Status.UnusedFlag = false;
 
-            byte low = StackPop();
-            byte high = StackPop();
-
-            PC = (UInt16)((high << 8) | low);
+            PC = StackPopWord();
 
             return false;
         }
@@ -675,10 +658,7 @@ namespace NesLib.Devices
         [InstructionMethod(AddressingMode = AddressingMode.IMP, Opcode = 0x60, Cycles = 6)]
         public bool RTS()
         {
-            byte low = StackPop();
-            byte high = StackPop();
-
-            PC = (UInt16)((high << 8) | low);
+            PC = StackPopWord();
             PC++;
 
             return false;
@@ -702,7 +682,7 @@ namespace NesLib.Devices
             UInt16 result = (UInt16)(A + data + (Status.CarryFlag ? 1 : 0));
 
             Status.CarryFlag = (result & (1 << 8)) != 0;
-            Status.ZeroFlag = result == 0;
+            UpdateZeroFlag((byte)result);
 
             byte accSign = (byte)(A & (1 << 7));
             byte dataSign = (byte)(data & (1 << 7));
@@ -779,8 +759,8 @@ namespace NesLib.Devices
         {
             X = A;
 
-            Status.ZeroFlag = X == 0;
-            Status.NegativeFlag = (X & (1 << 7)) != 0;
+            UpdateZeroFlag(X);
+            UpdateNegativeFlag(X);
 
             return false;
         }
@@ -791,8 +771,8 @@ namespace NesLib.Devices
         {
             Y = A;
 
-            Status.ZeroFlag = Y == 0;
-            Status.NegativeFlag = (Y & (1 << 7)) != 0;
+            UpdateZeroFlag(Y);
+            UpdateNegativeFlag(Y);
 
             return false;
         }
@@ -803,8 +783,8 @@ namespace NesLib.Devices
         {
             X = StackPointer;
 
-            Status.ZeroFlag = X == 0;
-            Status.NegativeFlag = (X & (1 << 7)) != 0;
+            UpdateZeroFlag(X);
+            UpdateNegativeFlag(Y);
 
             return false;
         }
@@ -815,8 +795,8 @@ namespace NesLib.Devices
         {
             A = X;
 
-            Status.ZeroFlag = (A == 0);
-            Status.NegativeFlag = (A & (1 << 7)) != 0;
+            UpdateZeroFlag(A);
+            UpdateNegativeFlag(A);
 
             return false;
         }
@@ -835,8 +815,8 @@ namespace NesLib.Devices
         {
             A = Y;
 
-            Status.ZeroFlag = (A == 0);
-            Status.NegativeFlag = (A & (1 << 7)) != 0;
+            UpdateZeroFlag(A);
+            UpdateNegativeFlag(A);
 
             return false;
         }

@@ -62,10 +62,24 @@ namespace NesLib.Devices
             return Read(address);
         }
 
+        private UInt16 ReadWord(UInt16 address)
+        {
+            byte low = Read(address);
+            byte high = Read((UInt16)(address + 1));
+
+            return (UInt16)((high << 8) | low);
+        }
+
         private void StackPush(byte data)
         {
             Write((UInt16)(StackBaseAddress + StackPointer), data);
             StackPointer--;
+        }
+
+        private void StackPushWord(UInt16 data)
+        {
+            StackPush((byte)((data >> 8) & 0x00FF));
+            StackPush((byte)(data & 0x00FF));
         }
 
         private byte StackPop()
@@ -73,6 +87,24 @@ namespace NesLib.Devices
             byte res = Read((UInt16)(StackBaseAddress + StackPointer));
             StackPointer++;
             return res;
+        }
+
+        private UInt16 StackPopWord()
+        {
+            byte low = StackPop();
+            byte high = StackPop();
+
+            return (UInt16)((high << 8) | low);
+        }
+
+        private void UpdateZeroFlag(byte target)
+        {
+            Status.ZeroFlag = (target == 0);
+        }
+
+        private void UpdateNegativeFlag(byte target)
+        {
+            Status.NegativeFlag = (target & (1 << 7)) != 0;
         }
     }
 }
