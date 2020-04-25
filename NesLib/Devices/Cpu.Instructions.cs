@@ -73,7 +73,7 @@ namespace NesLib.Devices
             }
             else
             {
-                Write(address, data);
+                CpuWrite(address, data);
             }
 
             return false;
@@ -311,7 +311,7 @@ namespace NesLib.Devices
 
             data -= 1;
 
-            Write(address, data);
+            CpuWrite(address, data);
 
             UpdateZeroFlag(data);
             UpdateNegativeFlag(data);
@@ -375,7 +375,7 @@ namespace NesLib.Devices
 
             data += 1;
 
-            Write(address, data);
+            CpuWrite(address, data);
 
             UpdateZeroFlag(data);
             UpdateNegativeFlag(data);
@@ -504,7 +504,7 @@ namespace NesLib.Devices
             }
             else
             {
-                Write(address, result);
+                CpuWrite(address, result);
             }
 
             return false;
@@ -606,7 +606,7 @@ namespace NesLib.Devices
             }
             else
             {
-                Write(address, data);
+                CpuWrite(address, data);
             }
 
             return false;
@@ -635,7 +635,7 @@ namespace NesLib.Devices
             }
             else
             {
-                Write(address, data);
+                CpuWrite(address, data);
             }
 
             return false;
@@ -729,7 +729,7 @@ namespace NesLib.Devices
         [InstructionMethod(AddressingMode = AddressingMode.IZY, Opcode = 0x91, Cycles = 6)]
         public bool STA()
         {
-            Write(address, A);
+            CpuWrite(address, A);
             return false;
         }
 
@@ -739,7 +739,7 @@ namespace NesLib.Devices
         [InstructionMethod(AddressingMode = AddressingMode.ABS, Opcode = 0x8E, Cycles = 4)]
         public bool STX()
         {
-            Write(address, X);
+            CpuWrite(address, X);
             return false;
         }
 
@@ -749,7 +749,7 @@ namespace NesLib.Devices
         [InstructionMethod(AddressingMode = AddressingMode.ABS, Opcode = 0x8C, Cycles = 4)]
         public bool STY()
         {
-            Write(address, Y);
+            CpuWrite(address, Y);
             return false;
         }
 

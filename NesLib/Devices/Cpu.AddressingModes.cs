@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NesLib.Utils;
+using System;
 
 namespace NesLib.Devices
 {
@@ -26,7 +27,7 @@ namespace NesLib.Devices
         [AddressingModeMethod(AddressingMode = AddressingMode.ZP0)]
         public bool ZP0()
         {
-            byte low = Read(PC++);
+            byte low = CpuRead(PC++);
 
             address = (UInt16)(0x00FF | low);
             return false;
@@ -37,7 +38,7 @@ namespace NesLib.Devices
         {
             UInt16 addressToRead = (UInt16)(PC + X);
 
-            byte low = Read(addressToRead);
+            byte low = CpuRead(addressToRead);
             PC++;
 
             address = (UInt16)(0x00FF | low);
@@ -49,7 +50,7 @@ namespace NesLib.Devices
         {
             UInt16 addressToRead = (UInt16)(PC + Y);
 
-            byte low = Read(addressToRead);
+            byte low = CpuRead(addressToRead);
             PC++;
 
             address = (UInt16)(0x00FF | low);
@@ -59,7 +60,7 @@ namespace NesLib.Devices
         [AddressingModeMethod(AddressingMode = AddressingMode.REL)]
         public bool REL()
         {
-            jumpOffset = Read(PC++);
+            jumpOffset = CpuRead(PC++);
 
             if ((jumpOffset & 0x80) != 0)
             {
@@ -71,8 +72,8 @@ namespace NesLib.Devices
         [AddressingModeMethod(AddressingMode = AddressingMode.ABS)]
         public bool ABS()
         {
-            byte low = Read(PC++);
-            byte high = Read(PC++);
+            byte low = CpuRead(PC++);
+            byte high = CpuRead(PC++);
 
             address = (UInt16)((high << 8) | low);
             return false;
@@ -117,26 +118,26 @@ namespace NesLib.Devices
         [AddressingModeMethod(AddressingMode = AddressingMode.IND)]
         public bool IND()
         {
-            byte low = Read(PC++);
-            byte high = Read(PC++);
+            byte low = CpuRead(PC++);
+            byte high = CpuRead(PC++);
 
-            UInt16 ptr = (UInt16)((high << 8) | low);
+            UInt16 ptr = BitMagic.Combine(high, low);
 
             byte addrLow, addrHigh;
 
             // hardware bug
             if (low == 0x00FF)
             {
-                addrLow = Read((UInt16)(ptr & 0xFF00));
-                addrHigh = Read((UInt16)(ptr));
+                addrLow = CpuRead((UInt16)(ptr & 0xFF00));
+                addrHigh = CpuRead((UInt16)(ptr));
             }
             else
             {
-                addrLow = Read(ptr);
-                addrHigh = Read((UInt16)(ptr + 1));
+                addrLow = CpuRead(ptr);
+                addrHigh = CpuRead((UInt16)(ptr + 1));
             }
 
-            address = (UInt16)((addrHigh << 8) | addrLow);
+            address = BitMagic.Combine(addrHigh, addrLow);
 
             return false;
         }
@@ -144,16 +145,16 @@ namespace NesLib.Devices
         [AddressingModeMethod(AddressingMode = AddressingMode.IZX)]
         public bool IZX()
         {
-            byte low = Read(PC++);
-            byte high = Read(PC++);
+            byte low = CpuRead(PC++);
+            byte high = CpuRead(PC++);
 
-            UInt16 ptr = (UInt16)((high << 8) | low);
+            UInt16 ptr = BitMagic.Combine(high, low);
 
             // address is in zero page
-            byte addrLow = Read((UInt16)((ptr + X) & 0x00FF));
-            byte addrHigh = Read((UInt16)((ptr + X + 1) & 0x00FF));
+            byte addrLow = CpuRead((UInt16)((ptr + X) & 0x00FF));
+            byte addrHigh = CpuRead((UInt16)((ptr + X + 1) & 0x00FF));
 
-            address = (UInt16)((addrHigh << 8) | addrLow);
+            address = BitMagic.Combine(addrHigh, addrLow);
 
             return false;
         }
@@ -161,16 +162,16 @@ namespace NesLib.Devices
         [AddressingModeMethod(AddressingMode = AddressingMode.IZY)]
         public bool IZY()
         {
-            byte low = Read(PC++);
-            byte high = Read(PC++);
+            byte low = CpuRead(PC++);
+            byte high = CpuRead(PC++);
 
-            UInt16 ptr = (UInt16)((high << 8) | low);
+            UInt16 ptr = BitMagic.Combine(high, low);
 
             // address is in zero page
-            byte addrLow = Read((UInt16)((ptr + Y) & 0x00FF));
-            byte addrHigh = Read((UInt16)((ptr + Y + 1) & 0x00FF));
+            byte addrLow = CpuRead((UInt16)((ptr + Y) & 0x00FF));
+            byte addrHigh = CpuRead((UInt16)((ptr + Y + 1) & 0x00FF));
 
-            address = (UInt16)((addrHigh << 8) | addrLow);
+            address = BitMagic.Combine(addrHigh, addrLow);
 
             // if page is crossed
             if ((address & 0xFF00) != (high << 8))

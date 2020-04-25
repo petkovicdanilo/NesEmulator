@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace NesLib.Devices
 {
-    public partial class Cpu : IDevice
+    public partial class Cpu : IClockDevice, ICpuBusDevice
     {
         // accumulator
         public byte A
@@ -119,21 +119,21 @@ namespace NesLib.Devices
                 });
         }
 
-        public void Write(UInt16 address, byte data)
+        public void CpuWrite(UInt16 address, byte data)
         {
-            nes.Write(address, data);
+            nes.CpuWrite(address, data);
         }
 
-        public byte Read(UInt16 address)
+        public byte CpuRead(UInt16 address)
         {
-            return nes.Read(address);
+            return nes.CpuRead(address);
         }
 
         public void Clock()
         {
             if (cycles == 0)
             {
-                currentOpcode = Read(PC++);
+                currentOpcode = CpuRead(PC++);
 
                 // illegal opcode
                 if (!operations.ContainsKey(currentOpcode))
@@ -168,11 +168,7 @@ namespace NesLib.Devices
             Status.Register = 0x00;
             Status.UnusedFlag = uFlag;
 
-            UInt16 nextPCAddress = 0xFFFC;
-            byte low = Read(nextPCAddress);
-            byte high = Read((UInt16)(nextPCAddress + 1));
-
-            PC = (UInt16)((high << 8) | low);
+            PC = ReadWord(0xFFFC);
 
             // clean up additional variables
             address = 0;
@@ -198,12 +194,7 @@ namespace NesLib.Devices
 
                 StackPush(Status.Register);
 
-                UInt16 newPCAddress = 0xFFFE;
-
-                byte low = Read(newPCAddress);
-                byte high = Read((UInt16)(newPCAddress + 1));
-
-                PC = (UInt16)((high << 8) | low);
+                PC = ReadWord(0xFFFE);
 
                 cycles = 7;
             }
@@ -225,15 +216,9 @@ namespace NesLib.Devices
 
             StackPush(Status.Register);
 
-            UInt16 newPCAddress = 0xFFFA;
-
-            byte low = Read(newPCAddress);
-            byte high = Read((UInt16)(newPCAddress + 1));
-
-            PC = (UInt16)((high << 8) | low);
+            PC = ReadWord(0xFFFA);
 
             cycles = 7;
         }
-
     }
 }
