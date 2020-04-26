@@ -1,19 +1,19 @@
-﻿namespace NesLib.Devices.Registers
-{
-    public class StatusRegister
-    {
-        public byte Register { get; set; }
+﻿using NesLib.Utils;
 
+namespace NesLib.Devices.Registers.Cpu
+{
+    public class StatusRegister : AbstractRegister
+    {
         // C
         public bool CarryFlag
         {
             get
             {
-                return getBit(0);
+                return BitMagic.IsBitSet(Register, 0);
             }
             set
             {
-                setBit(0, value);
+                BitMagic.SetBit(ref _register, 0, value);
             }
         }
 
@@ -22,11 +22,11 @@
         {
             get
             {
-                return getBit(1);
+                return BitMagic.IsBitSet(Register, 1);
             }
             set
             {
-                setBit(1, value);
+                BitMagic.SetBit(ref _register, 1, value);
             }
         }
 
@@ -35,11 +35,11 @@
         {
             get
             {
-                return getBit(2);
+                return BitMagic.IsBitSet(Register, 2);
             }
             set
             {
-                setBit(2, value);
+                BitMagic.SetBit(ref _register, 2, value);
             }
         }
 
@@ -49,11 +49,11 @@
         {
             get
             {
-                return getBit(3);
+                return BitMagic.IsBitSet(Register, 3);
             }
             set
             {
-                setBit(3, value);
+                BitMagic.SetBit(ref _register, 3, value);
             }
         }
 
@@ -62,11 +62,11 @@
         {
             get
             {
-                return getBit(4);
+                return BitMagic.IsBitSet(Register, 4);
             }
             set
             {
-                setBit(4, value);
+                BitMagic.SetBit(ref _register, 4, value);
             }
         }
 
@@ -75,11 +75,11 @@
         {
             get
             {
-                return getBit(5);
+                return BitMagic.IsBitSet(Register, 5);
             }
             set
             {
-                setBit(5, value);
+                BitMagic.SetBit(ref _register, 5, value);
             }
         }
 
@@ -88,11 +88,11 @@
         {
             get
             {
-                return getBit(6);
+                return BitMagic.IsBitSet(Register, 6);
             }
             set
             {
-                setBit(6, value);
+                BitMagic.SetBit(ref _register, 6, value);
             }
         }
 
@@ -101,33 +101,11 @@
         {
             get
             {
-                return getBit(7);
+                return BitMagic.IsBitSet(Register, 7);
             }
             set
             {
-                setBit(7, value);
-            }
-        }
-
-        public StatusRegister()
-        {
-            this.Register = 0x00;
-        }
-
-        private bool getBit(int n)
-        {
-            return (Register & (1 << n)) != 0;
-        }
-
-        private void setBit(int n, bool value)
-        {
-            if (value)
-            {
-                Register |= (byte)(1 << n);
-            }
-            else
-            {
-                Register &= (byte)~(1 << n);
+                BitMagic.SetBit(ref _register, 7, value);
             }
         }
 

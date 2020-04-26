@@ -1,4 +1,4 @@
-﻿using NesLib.Devices.Registers;
+﻿using NesLib.Devices.Registers.Cpu;
 using System;
 using System.Collections.Generic;
 using System.Linq;
