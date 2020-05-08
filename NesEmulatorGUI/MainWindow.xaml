@@ -5,9 +5,32 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NesEmulatorGUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
-        KeyDown="Window_KeyDown">
-    <Grid>
-        <TextBlock x:Name="Status"></TextBlock>
-    </Grid>
+        Title="NesEmulator"
+        ResizeMode="CanMinimize"
+        SizeToContent="WidthAndHeight">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Load game"/>
+                <MenuItem Header="_Save state"/>
+                <MenuItem Header="_Load state"/>
+                <MenuItem Header="_Exit"/>
+            </MenuItem>
+            <MenuItem Header="_Game">
+                <MenuItem Header="_Pause"/>
+                <MenuItem Header="_Reset"/>
+            </MenuItem>
+            <MenuItem Header="_Settings">
+                <MenuItem Header="_Input settings"/>
+                <MenuItem Header="_Window settings"/>
+            </MenuItem>
+            <MenuItem Header="_Debug">
+                
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About"/>
+            </MenuItem>
+        </Menu>
+        <Image x:Name="NesScreen" Stretch="Fill" Height="720" Width="768"/>
+    </DockPanel>
 </Window>
