@@ -1,7 +1,7 @@
 ﻿using NesLib.Utils;
 using System;
 
-namespace NesLib.Devices
+namespace NesLib.Devices.CpuEntities
 {
     public partial class Cpu
     {
@@ -29,31 +29,29 @@ namespace NesLib.Devices
         {
             byte low = CpuRead(PC++);
 
-            address = (UInt16)(0x00FF | low);
+            address = (UInt16)(0x00FF & low);
             return false;
         }
 
         [AddressingModeMethod(AddressingMode = AddressingMode.ZPX)]
         public bool ZPX()
         {
-            UInt16 addressToRead = (UInt16)(PC + X);
-
-            byte low = CpuRead(addressToRead);
+            byte low = (byte)(CpuRead(PC) + X);
             PC++;
 
-            address = (UInt16)(0x00FF | low);
+            address = (UInt16)(0x00FF & low);
+
             return false;
         }
 
         [AddressingModeMethod(AddressingMode = AddressingMode.ZPY)]
         public bool ZPY()
         {
-            UInt16 addressToRead = (UInt16)(PC + Y);
-
-            byte low = CpuRead(addressToRead);
+            byte low = (byte)(CpuRead(PC) + Y);
             PC++;
 
-            address = (UInt16)(0x00FF | low);
+            address = (UInt16)(0x00FF & low);
+
             return false;
         }
 
@@ -66,6 +64,7 @@ namespace NesLib.Devices
             {
                 jumpOffset = (Int16)(jumpOffset | 0xFF00);
             }
+
             return false;
         }
 
@@ -75,7 +74,8 @@ namespace NesLib.Devices
             byte low = CpuRead(PC++);
             byte high = CpuRead(PC++);
 
-            address = (UInt16)((high << 8) | low);
+            address = BitMagic.Combine(high, low);
+
             return false;
         }
 
@@ -128,8 +128,8 @@ namespace NesLib.Devices
             // hardware bug
             if (low == 0x00FF)
             {
-                addrLow = CpuRead((UInt16)(ptr & 0xFF00));
-                addrHigh = CpuRead((UInt16)(ptr));
+                addrLow = CpuRead((ptr));
+                addrHigh = CpuRead((UInt16)(ptr & 0xFF00));
             }
             else
             {
@@ -145,16 +145,14 @@ namespace NesLib.Devices
         [AddressingModeMethod(AddressingMode = AddressingMode.IZX)]
         public bool IZX()
         {
-            byte low = CpuRead(PC++);
-            byte high = CpuRead(PC++);
-
-            UInt16 ptr = BitMagic.Combine(high, low);
+            byte t = CpuRead(PC++);
 
             // address is in zero page
-            byte addrLow = CpuRead((UInt16)((ptr + X) & 0x00FF));
-            byte addrHigh = CpuRead((UInt16)((ptr + X + 1) & 0x00FF));
+            byte addrLow = CpuRead((UInt16)((t + X) & 0x00FF));
+            byte addrHigh = CpuRead((UInt16)((t + X + 1) & 0x00FF));
 
             address = BitMagic.Combine(addrHigh, addrLow);
+            address += X;
 
             return false;
         }
@@ -162,19 +160,17 @@ namespace NesLib.Devices
         [AddressingModeMethod(AddressingMode = AddressingMode.IZY)]
         public bool IZY()
         {
-            byte low = CpuRead(PC++);
-            byte high = CpuRead(PC++);
-
-            UInt16 ptr = BitMagic.Combine(high, low);
+            byte t = CpuRead(PC++);
 
             // address is in zero page
-            byte addrLow = CpuRead((UInt16)((ptr + Y) & 0x00FF));
-            byte addrHigh = CpuRead((UInt16)((ptr + Y + 1) & 0x00FF));
+            byte addrLow = CpuRead((UInt16)(t & 0x00FF));
+            byte addrHigh = CpuRead((UInt16)((t + 1) & 0x00FF));
 
             address = BitMagic.Combine(addrHigh, addrLow);
+            address += Y;
 
             // if page is crossed
-            if ((address & 0xFF00) != (high << 8))
+            if (Page(address) != Page((UInt16)(addrHigh << 8)))
             {
                 return true;
             }

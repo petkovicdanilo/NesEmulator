@@ -1,14 +1,14 @@
-﻿using NesLib.Utils;
+﻿using NesLib.Devices;
+using NesLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NesLib.Devices.Registers.Ppu
+namespace NesLib.Devices.PpuEntities.Registers
 {
-    public class ControlRegister : AbstractRegister
+    public class MaskRegister : AbstractRegister
     {
-
-        public bool EnableNmi
+        public bool GreyScale
         {
             get
             {
@@ -20,8 +20,7 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        // unused
-        public bool SlaveMode
+        public bool ShowBackgroundLeft
         {
             get
             {
@@ -33,7 +32,7 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        public bool SpriteSize
+        public bool ShowSpritesLeft
         {
             get
             {
@@ -45,7 +44,7 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        public bool PatternBackground
+        public bool ShowBackground
         {
             get
             {
@@ -57,7 +56,7 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        public bool PatternSprite
+        public bool ShowSprites
         {
             get
             {
@@ -69,7 +68,7 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        public bool IncrementMode
+        public bool EmphasizeRed
         {
             get
             {
@@ -81,17 +80,28 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        // TODO: nametable
-        //public bool SpriteSize
-        //{
-        //    get
-        //    {
-        //        return BitMagic.IsBitSet(Register, 2);
-        //    }
-        //    set
-        //    {
-        //        BitMagic.SetBit(ref _register, 2, value);
-        //    }
-        //}
+        public bool EmphasizeGreen
+        {
+            get
+            {
+                return BitMagic.IsBitSet(Register, 6);
+            }
+            set
+            {
+                BitMagic.SetBit(ref _register, 6, value);
+            }
+        }
+
+        public bool EmphasizeBlue
+        {
+            get
+            {
+                return BitMagic.IsBitSet(Register, 7);
+            }
+            set
+            {
+                BitMagic.SetBit(ref _register, 7, value);
+            }
+        }
     }
 }

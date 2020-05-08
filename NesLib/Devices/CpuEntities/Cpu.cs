@@ -1,10 +1,11 @@
-﻿using NesLib.Devices.Registers.Cpu;
+﻿using NesLib.Devices.CpuEntities.Registers;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace NesLib.Devices
+namespace NesLib.Devices.CpuEntities
 {
     public partial class Cpu : IClockDevice, ICpuBusDevice
     {
@@ -112,6 +113,8 @@ namespace NesLib.Devices
                                 Mode = instMethodAttribute.AddressingMode,
                                 Instruction = del,
                                 InstructionName = method.Name,
+                                AddressingModeName = addressModes[instMethodAttribute.AddressingMode]
+                                    .Method.Name,
                                 Cycles = instMethodAttribute.Cycles
                             }
                         );
@@ -124,9 +127,17 @@ namespace NesLib.Devices
             nes.CpuWrite(address, data);
         }
 
-        public byte CpuRead(UInt16 address)
+        public byte CpuRead(UInt16 address, bool debugMode = false)
         {
-            return nes.CpuRead(address);
+            return nes.CpuRead(address, debugMode);
+        }
+
+        private string CpuStatus()
+        {
+            return $"A = {A:X}, X = {X:X}, Y = {Y:X}, PC = {PC:X}, SP = {StackPointer:X}, " +
+                $"C = {Status.CarryFlag}, Z = {Status.ZeroFlag}, I = {Status.InterruptDisableFlag} " +
+                $"B = {Status.BreakFlag}, U = {Status.UnusedFlag}, V = {Status.OverflowFlag} " +
+                $"N = {Status.NegativeFlag}";
         }
 
         public void Clock()
@@ -141,15 +152,14 @@ namespace NesLib.Devices
                     return;
                 }
 
-                Console.WriteLine($"{operations[currentOpcode].InstructionName}");
-
                 cycles = operations[currentOpcode].Cycles;
 
                 bool add1 = operations[currentOpcode].AddressingModeInstruction();
                 bool add2 = operations[currentOpcode].Instruction();
 
                 cycles += (add1 && add2) ? 1 : 0;
-
+                
+                // TODO jel treba
                 Status.UnusedFlag = true;
             }
 
@@ -163,10 +173,8 @@ namespace NesLib.Devices
             Y = 0x00;
             StackPointer = 0xFD;
 
-            bool uFlag = Status.UnusedFlag;
-
             Status.Register = 0x00;
-            Status.UnusedFlag = uFlag;
+            Status.UnusedFlag = true;
 
             PC = ReadWord(0xFFFC);
 
@@ -180,18 +188,14 @@ namespace NesLib.Devices
         // interrupt request signal
         public void IRQ()
         {
-            if (Status.InterruptDisableFlag == false)
+            if (!Status.InterruptDisableFlag)
             {
-                // push high byte of PC
-                StackPush((byte)((PC >> 8) & 0x00FF));
-                // push low byte of PC
-                StackPush((byte)(PC & 0x00FF));
+                StackPushWord(PC);
 
                 // handle status register
                 Status.BreakFlag = false;
                 Status.UnusedFlag = true;
                 Status.InterruptDisableFlag = true;
-
                 StackPush(Status.Register);
 
                 PC = ReadWord(0xFFFE);
@@ -203,22 +207,17 @@ namespace NesLib.Devices
         // non-maskable interrupt signal
         public void NMI()
         {
-
-            // push high byte of PC
-            StackPush((byte)((PC >> 8) & 0x00FF));
-            // push low byte of PC
-            StackPush((byte)(PC & 0x00FF));
+            StackPushWord(PC);
 
             // handle status register
             Status.BreakFlag = false;
             Status.UnusedFlag = true;
             Status.InterruptDisableFlag = true;
-
             StackPush(Status.Register);
 
             PC = ReadWord(0xFFFA);
 
-            cycles = 7;
+            cycles = 8;
         }
     }
 }

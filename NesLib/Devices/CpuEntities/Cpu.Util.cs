@@ -1,7 +1,7 @@
 ﻿using NesLib.Utils;
 using System;
 
-namespace NesLib.Devices
+namespace NesLib.Devices.CpuEntities
 {
     public partial class Cpu
     {
@@ -44,7 +44,8 @@ namespace NesLib.Devices
             public Instruction Instruction;
             public Instruction AddressingModeInstruction;
             public AddressingMode Mode;
-            public String InstructionName;
+            public string InstructionName;
+            public string AddressingModeName;
             public int Cycles;
         }
 
@@ -85,8 +86,8 @@ namespace NesLib.Devices
 
         private byte StackPop()
         {
-            byte res = CpuRead((UInt16)(StackBaseAddress + StackPointer));
             StackPointer++;
+            byte res = CpuRead((UInt16)(StackBaseAddress + StackPointer));
             return res;
         }
 
@@ -105,7 +106,7 @@ namespace NesLib.Devices
 
         private void UpdateNegativeFlag(byte target)
         {
-            Status.NegativeFlag = (target & (1 << 7)) != 0;
+            Status.NegativeFlag = BitMagic.IsBitSet(target, 7);
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using System;
+﻿using NesLib.Utils;
+using System;
 
-namespace NesLib.Devices
+namespace NesLib.Devices.CpuEntities
 {
     public partial class Cpu
     {
@@ -21,8 +22,7 @@ namespace NesLib.Devices
 
             UInt16 result = (UInt16)(A + data + (Status.CarryFlag ? 1 : 0));
 
-            Status.CarryFlag = (result & (1 << 8)) != 0;
-            UpdateZeroFlag((byte)result);
+            Status.CarryFlag = (result >= (1 << 8));
 
             byte accSign = (byte)(A & (1 << 7));
             byte dataSign = (byte)(data & (1 << 7));
@@ -32,6 +32,8 @@ namespace NesLib.Devices
 
             // write one byte result to accumulator
             A = (byte)(result & 0x00FF);
+            UpdateNegativeFlag(A);
+            UpdateZeroFlag(A);
 
             return true;
         }
@@ -65,7 +67,14 @@ namespace NesLib.Devices
         [InstructionMethod(AddressingMode = AddressingMode.ABX, Opcode = 0x1E, Cycles = 7)]
         public bool ASL()
         {
-            byte data = (byte)(Fetch() << 1);
+            byte data = Fetch();
+
+            Status.CarryFlag = BitMagic.IsBitSet(data, 7);
+
+            data <<= 1;
+
+            UpdateZeroFlag(data);
+            UpdateNegativeFlag(data);
 
             if (operations[currentOpcode].Mode == AddressingMode.ACC)
             {
@@ -172,7 +181,7 @@ namespace NesLib.Devices
         {
             PC++;
 
-            Status.UnusedFlag = true;
+            Status.InterruptDisableFlag = true;
 
             // push PC to stack
             StackPushWord(PC);
@@ -550,6 +559,7 @@ namespace NesLib.Devices
         public bool PHP()
         {
             Status.BreakFlag = true;
+            Status.UnusedFlag = true;
 
             StackPush(Status.Register);
 
@@ -567,8 +577,6 @@ namespace NesLib.Devices
 
             UpdateZeroFlag(A);
             UpdateNegativeFlag(A);
-
-            StackPointer++;
 
             return false;
         }
@@ -593,12 +601,14 @@ namespace NesLib.Devices
         {
             byte data = Fetch();
 
-            bool bit7Set = (data & (1 << 7)) != 0;
+            bool bit7Set = BitMagic.IsBitSet(data, 7);
 
             data <<= 1;
-            data |= (byte)(Status.CarryFlag ? 0x01 : 0x00);
-
+            BitMagic.SetBit(ref data, 0, Status.CarryFlag);
             Status.CarryFlag = bit7Set;
+
+            UpdateZeroFlag(data);
+            UpdateNegativeFlag(data);
 
             if(operations[currentOpcode].Mode == AddressingMode.ACC)
             {
@@ -622,12 +632,14 @@ namespace NesLib.Devices
         {
             byte data = Fetch();
 
-            bool bit0Set = (data & (1 << 0)) != 0;
+            bool bit0Set = BitMagic.IsBitSet(data, 0);
 
             data >>= 1;
-            data |= (byte)(Status.CarryFlag ? (1 << 7) : 0x00);
-
+            BitMagic.SetBit(ref data, 7, Status.CarryFlag);
             Status.CarryFlag = bit0Set;
+
+            UpdateZeroFlag(data);
+            UpdateNegativeFlag(data);
 
             if (operations[currentOpcode].Mode == AddressingMode.ACC)
             {
@@ -676,13 +688,12 @@ namespace NesLib.Devices
         public bool SBC()
         {
             // invert bits
-            byte data = (byte)~Fetch();
+            byte data = (byte)(~Fetch());
 
             // carry flag is now borrow flag
             UInt16 result = (UInt16)(A + data + (Status.CarryFlag ? 1 : 0));
 
             Status.CarryFlag = (result & (1 << 8)) != 0;
-            UpdateZeroFlag((byte)result);
 
             byte accSign = (byte)(A & (1 << 7));
             byte dataSign = (byte)(data & (1 << 7));
@@ -691,6 +702,8 @@ namespace NesLib.Devices
             Status.OverflowFlag = (accSign == dataSign && resultSign != accSign);
 
             A = (byte)(result & 0x00FF);
+            UpdateZeroFlag(A);
+            UpdateNegativeFlag(A);
 
             return true;
         }
@@ -784,7 +797,7 @@ namespace NesLib.Devices
             X = StackPointer;
 
             UpdateZeroFlag(X);
-            UpdateNegativeFlag(Y);
+            UpdateNegativeFlag(X);
 
             return false;
         }

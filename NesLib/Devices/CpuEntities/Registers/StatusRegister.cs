@@ -1,13 +1,12 @@
-﻿using NesLib.Utils;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using NesLib.Devices;
+using NesLib.Utils;
 
-namespace NesLib.Devices.Registers.Ppu
+namespace NesLib.Devices.CpuEntities.Registers
 {
-    public class MaskRegister : AbstractRegister
+    public class StatusRegister : AbstractRegister
     {
-        public bool GreyScale
+        // C
+        public bool CarryFlag
         {
             get
             {
@@ -19,7 +18,8 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        public bool ShowBackgroundLeft
+        // Z
+        public bool ZeroFlag
         {
             get
             {
@@ -31,7 +31,8 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        public bool ShowSpritesLeft
+        // I
+        public bool InterruptDisableFlag
         {
             get
             {
@@ -43,7 +44,9 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        public bool ShowBackground
+        // D
+        // unused in NES emulation
+        public bool DecimalFlag
         {
             get
             {
@@ -55,7 +58,8 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        public bool ShowSprites
+        // B
+        public bool BreakFlag
         {
             get
             {
@@ -67,7 +71,8 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        public bool EmphasizeRed
+        // U
+        public bool UnusedFlag
         {
             get
             {
@@ -79,7 +84,8 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        public bool EmphasizeGreen
+        // V
+        public bool OverflowFlag
         {
             get
             {
@@ -91,7 +97,8 @@ namespace NesLib.Devices.Registers.Ppu
             }
         }
 
-        public bool EmphasizeBlue
+        // N
+        public bool NegativeFlag
         {
             get
             {

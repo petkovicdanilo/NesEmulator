@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NesLib.Mappers
+namespace NesLib.Devices.CartridgeEntities.Mappers
 {
     public class Mapper000 : Mapper
     {
@@ -12,7 +12,7 @@ namespace NesLib.Mappers
         private const UInt16 CHR_LEFT = 0x0000;
         private const UInt16 CHR_RIGHT = 0x1FFF;
 
-        public Mapper000(int prgBanks, int chrBanks) : base(prgBanks, chrBanks)
+        public Mapper000(int prgBanks, int chrBanks) :  base(prgBanks, chrBanks)
         {
 
         }
@@ -42,6 +42,10 @@ namespace NesLib.Mappers
         public override UInt16 MapPpuWrite(UInt16 address)
         {
             // cannot write to ROM
+            if(InChrRange(address) && chrBanks == 0)
+            {
+                return address;
+            }
             return 0;
         }
 
@@ -61,7 +65,7 @@ namespace NesLib.Mappers
             {
                 // if 32K mirror
                 // if 62K mask to begin from 0x0000 for ROM file
-                return (UInt16)(address & (prgBanks == 1 ? 0x3FFF : 0x7FFF));
+                return (UInt16)(address & (prgBanks > 1 ? 0x7FFF : 0x3FFF));
             }
 
             return 0;

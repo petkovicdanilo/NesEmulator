@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NesLib.Devices.Registers
+namespace NesLib.Devices
 {
     public abstract class AbstractRegister
     {

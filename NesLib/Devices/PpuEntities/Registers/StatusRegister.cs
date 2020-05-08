@@ -1,9 +1,10 @@
-﻿using NesLib.Utils;
+﻿using NesLib.Devices;
+using NesLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NesLib.Devices.Registers.Ppu
+namespace NesLib.Devices.PpuEntities.Registers
 {
     public class StatusRegister : AbstractRegister
     {

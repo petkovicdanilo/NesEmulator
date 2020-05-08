@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NesLib.Mappers
+namespace NesLib.Devices.CartridgeEntities.Mappers
 {
     public abstract class Mapper
     {

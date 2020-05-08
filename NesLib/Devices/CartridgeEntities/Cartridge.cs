@@ -1,8 +1,8 @@
-﻿using NesLib.Mappers;
+﻿using NesLib.Devices.CartridgeEntities.Mappers;
 using System;
 using System.IO;
 
-namespace NesLib.Devices
+namespace NesLib.Devices.CartridgeEntities
 {
     public class Cartridge : ICpuBusDevice, IPpuBusDevice
     {
@@ -11,9 +11,9 @@ namespace NesLib.Devices
         private byte[] prgMemory;
         private byte[] chrMemory;
 
-        private MirrorMode mirrorMode;
+        public MirrorMode Mode { get; private set; }
 
-        private enum MirrorMode
+        public enum MirrorMode
         {
             HORIZONTAL,
             VERTICAL
@@ -38,7 +38,7 @@ namespace NesLib.Devices
             }
         }
 
-        public byte CpuRead(ushort address)
+        public byte CpuRead(ushort address, bool debugMode = false)
         {
             UInt16 mappedAddress = mapper.MapCpuRead(address);
             return prgMemory[mappedAddress];
@@ -90,7 +90,7 @@ namespace NesLib.Devices
             int mapperId = (flags7 & 0xF0) | ((flags6 & 0xF0) >> 4);
             AddMapperFromId(mapperId);
 
-            mirrorMode = (flags6 & (1 << 0)) == 0 ? MirrorMode.HORIZONTAL : MirrorMode.VERTICAL;
+            Mode = (flags6 & (1 << 0)) == 0 ? MirrorMode.HORIZONTAL : MirrorMode.VERTICAL;
 
             bool hasTrainer = (flags6 & (1 << 2)) != 0;
 
@@ -105,10 +105,13 @@ namespace NesLib.Devices
         {
             string mapperIdString = mapperId.ToString().PadLeft(3, '0');
 
-            var objectType = Type.GetType($"NesLib.Mappers.Mapper{mapperIdString}");
+            var objectType = Type.GetType($"NesLib.Devices.CartridgeEntities.Mappers.Mapper{mapperIdString}");
             try
             {
-                mapper = Activator.CreateInstance(objectType, prgMemory.Length, chrMemory.Length) as Mapper;
+                int prgBanks = prgMemory.Length / (16 * 1024);
+                int chrBanks = chrMemory.Length / (8 * 1024);
+
+                mapper = Activator.CreateInstance(objectType, prgBanks, chrBanks) as Mapper;
             }
             catch(ArgumentNullException)
             {
