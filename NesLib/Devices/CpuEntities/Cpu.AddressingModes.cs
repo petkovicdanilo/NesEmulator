@@ -152,7 +152,6 @@ namespace NesLib.Devices.CpuEntities
             byte addrHigh = CpuRead((UInt16)((t + X + 1) & 0x00FF));
 
             address = BitMagic.Combine(addrHigh, addrLow);
-            address += X;
 
             return false;
         }
