@@ -33,6 +33,9 @@ namespace NesLib
 
         private byte[] capturedController = new byte[2];
 
+        private byte dmaPage, dmaAddress, dmaData;
+        private bool dmaStarted = false, dmaDummy = true;
+
         public bool FrameComplete
         {
             get
@@ -50,7 +53,7 @@ namespace NesLib
             this.cpu = new Cpu(this);
             this.ppu = new Ppu(this);
 
-            InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\nestest.nes");
+            InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\Donkey Kong (World) (Rev A).nes");
             Reset();
 
         }
@@ -61,7 +64,7 @@ namespace NesLib
             ppu.ConnectCartridge(cartridge);
         }
 
-        public byte CpuRead(UInt16 address, bool debugMode)
+        public byte CpuRead(UInt16 address, bool debugMode = false)
         {
             if (InCpuRamRange(address))
             {
@@ -104,7 +107,9 @@ namespace NesLib
             }
             else if (address == 0x4014)
             {
-
+                dmaPage = data;
+                dmaAddress = 0x00;
+                dmaStarted = true;
             }
             else if (address >= 0x4016 && address <= 0x4017)
             {
@@ -124,7 +129,39 @@ namespace NesLib
 
             if(clockCounter % 3 == 0)
             {
-                cpu.Clock();
+                if(dmaStarted)
+                {
+                    if(dmaDummy)
+                    {
+                        if(clockCounter % 2 == 1)
+                        {
+                            dmaDummy = false;
+                        }
+                    }
+                    else 
+                    {
+                        if (clockCounter % 2 == 0)
+                        {
+                            UInt16 address = BitMagic.Combine(dmaPage, dmaAddress);
+                            dmaData = CpuRead(address);
+                        }
+                        else
+                        {
+                            ppu.Oam[dmaAddress++] = dmaData;
+
+                            // after 256 writes dmaAddress loops back to zero
+                            if(dmaAddress == 0)
+                            {
+                                dmaStarted = false;
+                                dmaDummy = true;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    cpu.Clock();
+                }
             }
 
             if(ppu.EmitNmi)
@@ -133,10 +170,6 @@ namespace NesLib
             }
 
             clockCounter++;
-            if(clockCounter == 3)
-            {
-                clockCounter = 0;
-            }
         }
 
         public void Reset()

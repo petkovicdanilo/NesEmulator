@@ -1,4 +1,5 @@
 ﻿using NesLib.Devices.CartridgeEntities;
+using NesLib.Devices.PpuEntities.OAM;
 using NesLib.Devices.PpuEntities.Registers;
 using NesLib.Utils;
 using System;
@@ -29,9 +30,10 @@ namespace NesLib.Devices.PpuEntities
         private Nametable nametable = new Nametable();
         // palettes
         private PaletteRam paletteRam = new PaletteRam();
+        // oam - sprites
+        public ObjectAttributeMemory Oam = new ObjectAttributeMemory();
 
         public WriteableBitmap Screen = BitmapFactory.New(256, 240);
-        //public WriteableBitmap Screen = BitmapFactory.New(340, 256);
 
         private int cycle = 0;
         private int scanLine = 0;
@@ -64,6 +66,8 @@ namespace NesLib.Devices.PpuEntities
         private ShiftRegister bgPatternHigh = new ShiftRegister();
         private ShiftRegister bgAttributeLow = new ShiftRegister();
         private ShiftRegister bgAttributeHigh = new ShiftRegister();
+
+        private byte oamAddress = 0x00;
 
         public bool FrameComplete { get; set; } = false;
 
@@ -131,8 +135,8 @@ namespace NesLib.Devices.PpuEntities
                     break;
 
                 // OAM Data
-                case 0x0004: 
-                    break;
+                case 0x0004:
+                    return Oam[oamAddress];
 
                 // Scroll
                 case 0x0005: 
@@ -180,10 +184,12 @@ namespace NesLib.Devices.PpuEntities
 
                 // OAM Address
                 case 0x0003:
+                    oamAddress = data;
                     break;
 
                 // OAM Data
                 case 0x0004:
+                    Oam[oamAddress] = data;
                     break;
 
                 // Scroll
@@ -270,19 +276,10 @@ namespace NesLib.Devices.PpuEntities
             // invisible scanline -1
             if (scanLine == -1) 
             {
-                if(cycle == 1)
+                if (cycle == 1)
                 {
                     statusRegister.VerticalBlank = false;
                 }
-
-                // TODO < or <= 305
-                //if(cycle >= 280 && cycle < 305)
-                //{
-                //    if(RenderingEnabled())
-                //    {
-                //        vRam.TransferY(tRam);
-                //    }
-                //}
             }
 
             // visible scanlines, except scanline -1
