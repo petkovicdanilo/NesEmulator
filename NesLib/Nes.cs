@@ -1,6 +1,8 @@
-﻿using NesLib.Devices.CartridgeEntities;
+﻿using NesLib.Devices;
+using NesLib.Devices.CartridgeEntities;
 using NesLib.Devices.CpuEntities;
 using NesLib.Devices.PpuEntities;
+using NesLib.Utils;
 using System;
 using System.Collections.Generic;
 using System.Windows.Media.Imaging;
@@ -13,6 +15,12 @@ namespace NesLib
         private Ppu ppu;
         private Cartridge cartridge;
 
+        public Controller[] controllers = new Controller[2] 
+        {
+            new Controller(),
+            new Controller()
+        };
+
         private const UInt16 CPU_RAM_LEFT = 0x0000, CPU_RAM_RIGHT = 0x1FFF;
         private const UInt16 PPU_LEFT = 0x2000, PPU_RIGHT = 0x3FFF;
 
@@ -22,6 +30,8 @@ namespace NesLib
         private int clockCounter = 0;
 
         private byte[] cpuRam = new byte[2048];
+
+        private byte[] capturedController = new byte[2];
 
         public bool FrameComplete
         {
@@ -67,7 +77,12 @@ namespace NesLib
             }
             else if (address >= 0x4016 && address <= 0x4017)
             {
+                int index = address & 0x0001;
+                byte data = (byte)(BitMagic.IsBitSet(capturedController[index], 7) ? 0x01 : 0x00);
 
+                capturedController[index] <<= 1;
+
+                return data;
             }
             else if(address >= 0x4020 && address <= 0xFFFF)
             {
@@ -93,7 +108,8 @@ namespace NesLib
             }
             else if (address >= 0x4016 && address <= 0x4017)
             {
-
+                int index = address & 0x0001;
+                capturedController[index] = controllers[index].State;
             }
             else if (address >= 0x4020 && address <= 0xFFFF)
             {
