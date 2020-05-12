@@ -558,13 +558,12 @@ namespace NesLib.Devices.CpuEntities
         [InstructionMethod(AddressingMode = AddressingMode.IMP, Opcode = 0x08, Cycles = 3)]
         public bool PHP()
         {
-            Status.BreakFlag = true;
-            Status.UnusedFlag = true;
+            bool isBreakSet = Status.BreakFlag;
 
+            Status.BreakFlag = true;
             StackPush(Status.Register);
 
-            Status.BreakFlag = false;
-            Status.UnusedFlag = false;
+            Status.BreakFlag = isBreakSet;
 
             return false;
         }
