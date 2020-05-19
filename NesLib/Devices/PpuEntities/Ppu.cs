@@ -380,25 +380,26 @@ namespace NesLib.Devices.PpuEntities
 
         private void DrawPixel()
         {
-            byte bgPixel = 0x00, bgPalette = 0x00;
+            Pixel bgPixel = new Pixel();
+
             if (maskRegister.ShowBackground)
             {
                 UInt16 bitmask = (UInt16)(0x8000 >> fineX);
 
-                bgPixel = (byte)
+                bgPixel.Value = (byte)
                 (
                     (((bgPatternHigh.Register & bitmask) > 0 ? 1 : 0) << 1) |
                     ((bgPatternLow.Register & bitmask) > 0 ? 1 : 0)
                 );
 
-                bgPalette = (byte)
+                bgPixel.Palette = (byte)
                 (
                     (((bgAttributeHigh.Register & bitmask) > 0 ? 1 : 0) << 1) |
                     ((bgAttributeLow.Register & bitmask) > 0 ? 1 : 0)
                 );
             }
 
-            byte fgPixel = 0x00, fgPalette = 0x00;
+            Pixel fgPixel = new Pixel();
             bool fgPriority = false;
             if (maskRegister.ShowSprites)
             {
@@ -413,11 +414,11 @@ namespace NesLib.Devices.PpuEntities
                         byte fgPixelLow = (byte)(BitMagic.IsBitSet(spriteShiftLow[i], 7) ? 0x01 : 0x00);
                         byte fgPixelHigh = (byte)(BitMagic.IsBitSet(spriteShiftHigh[i], 7) ? 0x01 : 0x00);
 
-                        fgPixel = (byte)((fgPixelHigh << 1) | fgPixelLow);
-                        fgPalette = sprite.Attributes.Palette;
+                        fgPixel.Value = (byte)((fgPixelHigh << 1) | fgPixelLow);
+                        fgPixel.Palette = sprite.Attributes.Palette;
                         fgPriority = sprite.Attributes.Priority; // TODO da li treba invertovano
 
-                        if (fgPixel != 0)
+                        if (fgPixel.Value != 0)
                         {
                             break;
                         }
@@ -425,21 +426,11 @@ namespace NesLib.Devices.PpuEntities
                 }
             }
 
-            byte pixel, palette;
-            if (bgPixel == 0 || (fgPixel > 0 && fgPriority))
-            {
-                pixel = fgPixel;
-                palette = fgPalette;
-            }
-            else
-            {
-                pixel = bgPixel;
-                palette = bgPalette;
-            }
+            Pixel pixel = Pixel.Pick(bgPixel, fgPixel, fgPriority);
 
             if (cycle >= 1 && cycle <= 256 && scanLine >= 0 && scanLine < 240)
             {
-                Screen.SetPixel(cycle - 1, scanLine, paletteRam.PixelColor(palette, pixel));
+                Screen.SetPixel(cycle - 1, scanLine, paletteRam.PixelColor(pixel));
             }
         }
 

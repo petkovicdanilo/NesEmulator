@@ -81,9 +81,9 @@ namespace NesLib.Devices.PpuEntities
             Color.FromRgb(0, 0, 0)
         };
 
-        public Color PixelColor(byte palette, byte pixel)
+        public Color PixelColor(Pixel pixel)
         {
-            UInt16 address = (UInt16)((0x3F00 + (palette << 2) + pixel));
+            UInt16 address = (UInt16)((0x3F00 + (pixel.Palette << 2) + pixel.Value));
 
             return colors[Read(address) & 0x3F];
         }
