@@ -42,5 +42,14 @@ namespace NesLib.Utils
                 target &= (UInt16)~(1 << positon);
             }
         }
+
+        public static byte Flip(byte target)
+        {
+            target = (byte)((target & 0xF0) >> 4 | (target & 0x0F) << 4);
+            target = (byte)((target & 0xCC) >> 2 | (target & 0x33) << 2);
+            target = (byte)((target & 0xAA) >> 1 | (target & 0x55) << 1);
+
+            return target;
+        }
     }
 }

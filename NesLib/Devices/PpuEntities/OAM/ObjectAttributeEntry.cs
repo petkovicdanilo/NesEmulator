@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NesLib.Devices.PpuEntities.OAM
 {
-    public class ObjectAttributeEntry
+    public class ObjectAttributeEntry : ICloneable
     {
         public byte Y { get; set; }
         public byte Id { get; set; }
@@ -48,6 +48,32 @@ namespace NesLib.Devices.PpuEntities.OAM
                         break;
                 }
             }
+        }
+
+        public ObjectAttributeEntry()
+        {
+
+        }
+
+        public ObjectAttributeEntry(ObjectAttributeEntry other)
+        {
+            Attributes = other.Attributes.Clone() as Attributes;
+            X = other.X;
+            Y = other.Y;
+            Id = other.Id;
+        }
+
+        public object Clone()
+        {
+            return new ObjectAttributeEntry(this);
+        }
+
+        public void Reset()
+        {
+            Attributes.Register = 0xFF;
+            X = 0xFF;
+            Y = 0xFF;
+            Id = 0xFF;
         }
     }
 }

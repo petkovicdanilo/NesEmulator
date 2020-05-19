@@ -74,10 +74,6 @@ namespace NesLib
             {
                 return ppu.CpuRead(MaskPpu(address), debugMode);
             }
-            else if (address == 0x4014)
-            {
-
-            }
             else if (address >= 0x4016 && address <= 0x4017)
             {
                 int index = address & 0x0001;

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NesLib.Devices.PpuEntities.OAM
 {
-    public class Attributes
+    public class Attributes: ICloneable
     {
         private byte _register;
 
@@ -21,19 +21,20 @@ namespace NesLib.Devices.PpuEntities.OAM
             }
         }
 
-        public int Palette
+        public byte Palette
         {
             get
             {
-                return Register & 0x03;
+                return (byte)((Register & 0x03) + 0x04);
             }
             set
             {
-                Register &= (byte)(0xFC);
+
+                Register &= 0xFC;
 
                 // we only need bottom 2 bits
                 value &= 0x03;
-                Register |= (byte)(value);
+                Register |= value;
             }
         }
 
@@ -41,7 +42,7 @@ namespace NesLib.Devices.PpuEntities.OAM
         {
             get
             {
-                return BitMagic.IsBitSet(Register, 5);
+                return !BitMagic.IsBitSet(Register, 5);
             }
             set
             {
@@ -71,6 +72,13 @@ namespace NesLib.Devices.PpuEntities.OAM
             {
                 BitMagic.SetBit(ref _register, 7, value);
             }
+        }
+
+        public object Clone()
+        {
+            Attributes clone = new Attributes();
+            clone.Register = this.Register;
+            return clone;
         }
     }
 }

@@ -20,19 +20,24 @@ namespace NesLib.Devices.PpuEntities.OAM
         {
             get
             {
-                int entryIndex = ind / 64;
-                int innerIndex = ind % 64;
+                int entryIndex = ind / 4;
+                int innerIndex = ind % 4;
 
                 return entries[entryIndex][innerIndex];
             }
 
             set
             {
-                int entryIndex = ind / 64;
-                int innerIndex = ind % 64;
+                int entryIndex = ind / 4;
+                int innerIndex = ind % 4;
 
                 entries[entryIndex][innerIndex] = value;
             }
+        }
+
+        public ObjectAttributeEntry EntryAt(int ind)
+        {
+            return entries[ind];
         }
     }
 }

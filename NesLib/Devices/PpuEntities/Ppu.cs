@@ -69,11 +69,21 @@ namespace NesLib.Devices.PpuEntities
 
         private byte oamAddress = 0x00;
 
+        private ObjectAttributeEntry[] currentScanlineSprites = new ObjectAttributeEntry[8];
+        private byte[] spriteShiftLow = new byte[8];
+        private byte[] spriteShiftHigh = new byte[8];
+        private int spritesNumber = 0;
+
         public bool FrameComplete { get; set; } = false;
 
         public Ppu(Nes nes)
         {
             this.nes = nes;
+
+            for(int i = 0; i < 8; ++i)
+            {
+                currentScanlineSprites[i] = new ObjectAttributeEntry();
+            }
         }
 
         public void Reset()
@@ -100,6 +110,11 @@ namespace NesLib.Devices.PpuEntities
             controlRegister.Register = 0;
             maskRegister.Register = 0;
             statusRegister.Register = 0;
+
+            for(int i = 0; i < 8; ++i)
+            {
+                currentScanlineSprites[i] = new ObjectAttributeEntry();
+            }
         }
 
         public void ConnectCartridge(Cartridge cartridge)
@@ -274,11 +289,14 @@ namespace NesLib.Devices.PpuEntities
         public void Clock()
         {
             // invisible scanline -1
-            if (scanLine == -1) 
+            if (scanLine == -1)
             {
                 if (cycle == 1)
                 {
                     statusRegister.VerticalBlank = false;
+
+                    statusRegister.SpriteOverflow = false;
+
                 }
             }
 
@@ -286,13 +304,12 @@ namespace NesLib.Devices.PpuEntities
             if (scanLine >= -1 && scanLine < 240)
             {
                 // cycle is skipped
-                if(scanLine == 0 && cycle == 0)
+                if (scanLine == 0 && cycle == 0)
                 {
                     cycle = 1;
                 }
-                
-                // 338 ili 337? 257 ili 258
-                if((cycle >= 1 && cycle <= 256) || (cycle >= 321 && cycle <= 336))
+
+                if ((cycle >= 1 && cycle <= 256) || (cycle >= 321 && cycle <= 336))
                 {
                     UpdateShiftRegisters();
                     PreloadData();
@@ -308,46 +325,64 @@ namespace NesLib.Devices.PpuEntities
                 if (cycle == 257)
                 {
                     LoadShifters();
-                    if(RenderingEnabled())
+                    if (RenderingEnabled())
                     {
                         vRam.TransferX(tRam);
                     }
                 }
 
-                if(cycle == 338 || cycle == 340)
+                if (cycle == 338 || cycle == 340)
                 {
                     UInt16 address = (UInt16)(0x2000 | (vRam.Register & 0x0FFF));
                     bgNextTileId = PpuRead(address);
                 }
 
-                if(scanLine == -1 && cycle >= 280 && cycle < 305)
+                if (scanLine == -1 && cycle >= 280 && cycle < 305)
                 {
-                    if(RenderingEnabled())
+                    if (RenderingEnabled())
                     {
                         vRam.TransferY(tRam);
                     }
                 }
-                
+
+                // foreground
+
+                if (cycle == 257 && scanLine >= 0)
+                {
+                    EvaluateSprites();
+                }
+
+                if (cycle == 340)
+                {
+                    PopulateSpriteShifters();
+                }
+
             }
 
             // nothing happens on scanline 240
             if (scanLine == 240)
             {
-             
+
             }
 
             // end of visible scanlines
-            if(scanLine == 241 && cycle == 1)
+            if (scanLine == 241 && cycle == 1)
             {
                 statusRegister.VerticalBlank = true;
 
                 EmitNmi = controlRegister.EnableNmi;
             }
 
+            DrawPixel();
+
+            NextCycle();
+        }
+
+        private void DrawPixel()
+        {
             byte bgPixel = 0x00, bgPalette = 0x00;
             if (maskRegister.ShowBackground)
             {
-
                 UInt16 bitmask = (UInt16)(0x8000 >> fineX);
 
                 bgPixel = (byte)
@@ -363,12 +398,49 @@ namespace NesLib.Devices.PpuEntities
                 );
             }
 
-            if (cycle >= 1 && cycle <= 256 && scanLine >= 0 && scanLine < 240)
+            byte fgPixel = 0x00, fgPalette = 0x00;
+            bool fgPriority = false;
+            if (maskRegister.ShowSprites)
             {
-                Screen.SetPixel(cycle - 1, scanLine, paletteRam.PixelColor(bgPalette, bgPixel));
+                for (int i = 0; i < currentScanlineSprites.Length; ++i)
+                {
+                    var sprite = currentScanlineSprites[i];
+
+                    if (sprite.X == 0)
+                    {
+                        // we've hit the sprite
+                        // TODO out of range
+                        byte fgPixelLow = (byte)(BitMagic.IsBitSet(spriteShiftLow[i], 7) ? 0x01 : 0x00);
+                        byte fgPixelHigh = (byte)(BitMagic.IsBitSet(spriteShiftHigh[i], 7) ? 0x01 : 0x00);
+
+                        fgPixel = (byte)((fgPixelHigh << 1) | fgPixelLow);
+                        fgPalette = sprite.Attributes.Palette;
+                        fgPriority = sprite.Attributes.Priority; // TODO da li treba invertovano
+
+                        if (fgPixel != 0)
+                        {
+                            break;
+                        }
+                    }
+                }
             }
 
-            NextCycle();
+            byte pixel, palette;
+            if (bgPixel == 0 || (fgPixel > 0 && fgPriority))
+            {
+                pixel = fgPixel;
+                palette = fgPalette;
+            }
+            else
+            {
+                pixel = bgPixel;
+                palette = bgPalette;
+            }
+
+            if (cycle >= 1 && cycle <= 256 && scanLine >= 0 && scanLine < 240)
+            {
+                Screen.SetPixel(cycle - 1, scanLine, paletteRam.PixelColor(palette, pixel));
+            }
         }
 
         private void NextCycle()
@@ -380,7 +452,6 @@ namespace NesLib.Devices.PpuEntities
                 cycle = 0;
                 scanLine++;
 
-                // TODO
                 if (scanLine > 260)
                 {
                     scanLine = -1;
@@ -496,12 +567,152 @@ namespace NesLib.Devices.PpuEntities
 
         private void UpdateShiftRegisters()
         {
+            UpdateBackgroundShiftRegisters();
+            UpdateSpriteShiftRegisters();
+        }
+
+        private void UpdateBackgroundShiftRegisters()
+        {
             if(maskRegister.ShowBackground)
             {
                 bgPatternLow.Shift();
                 bgPatternHigh.Shift();
                 bgAttributeLow.Shift();
                 bgAttributeHigh.Shift();
+            }
+        }
+
+        private void EvaluateSprites()
+        {
+            for(int i = 0; i < spritesNumber; ++i)
+            {
+                currentScanlineSprites[i].Reset();
+            }
+            spritesNumber = 0;
+
+            statusRegister.SpriteOverflow = false;
+            // decide which sprites are visible on current scanline
+            for (int i = 0; i < 64; ++i)
+            {
+                ObjectAttributeEntry currentSprite = Oam.EntryAt(i);
+                int diff = scanLine - currentSprite.Y;
+
+                if(diff >= 0 && diff < (controlRegister.SpriteSize ? 16 : 8))
+                {
+                    if(spritesNumber == 8)
+                    {
+                        statusRegister.SpriteOverflow = true;
+                        break;
+                    }
+
+                    // clone because we are modifying X value in each cycle
+                    currentScanlineSprites[spritesNumber++] = currentSprite.Clone() as ObjectAttributeEntry;
+                }
+            }
+        }
+
+        private void PopulateSpriteShifters()
+        {
+            for(int i = 0; i < 8; ++i)
+            {
+                spriteShiftLow[i] = 0;
+                spriteShiftHigh[i] = 0;
+            }
+
+            for (int i = 0; i < spritesNumber; ++i)
+            {
+                var sprite = currentScanlineSprites[i];
+                UInt16 addrLow = 0x0000, addrHigh = 0x0000;
+                byte patternTable = 0x00, spriteRow = 0x00;
+                UInt16 tilePosition = 0x0000;
+
+                if (!controlRegister.SpriteSize)
+                {
+                    // 8x8
+                    patternTable = (byte)((controlRegister.PatternSprite ? 0x01 : 0x00) << 12);
+                    tilePosition = (UInt16)(sprite.Id << 4);
+
+                    if(!sprite.Attributes.FlipVertically)
+                    {
+                        spriteRow = (byte)(scanLine - sprite.Y);
+                    }
+                    else
+                    {
+                        spriteRow = (byte)(7 - (scanLine - sprite.Y));
+                    }
+                }
+                else
+                {
+                    // 8x16
+                    patternTable = (byte)((BitMagic.IsBitSet(sprite.Id, 0) ? 0x01 : 0x00) << 12);
+
+                    if (!sprite.Attributes.FlipVertically)
+                    {
+                        if (scanLine - sprite.Y < 8)
+                        {
+                            // top half
+                            tilePosition = (UInt16)((sprite.Id & 0xFE) << 4);
+                        }
+                        else
+                        {
+                            // bottom half
+                            tilePosition = (UInt16)(((sprite.Id & 0xFE) + 1) << 4);
+                        }
+
+                        spriteRow = (byte)((scanLine - sprite.Y) & 0x07);
+                    }
+                    else
+                    {
+                        if (scanLine - sprite.Y < 8)
+                        {
+                            // top half
+                            tilePosition = (UInt16)(((sprite.Id & 0xFE) + 1) << 4);
+                        }
+                        else
+                        {
+                            // bottom half
+                            tilePosition = (UInt16)((sprite.Id & 0xFE) << 4);
+                        }
+
+                        spriteRow = (byte)((7 - (scanLine - sprite.Y)) & 0x07);
+                    }
+                }
+
+                addrLow = (UInt16)(patternTable | tilePosition | spriteRow);
+                addrHigh = (UInt16)(addrLow + 8);
+
+                byte spriteLow = PpuRead(addrLow);
+                byte spriteHigh = PpuRead(addrHigh);
+
+                if(sprite.Attributes.FlipHorizontally)
+                {
+                    spriteLow = BitMagic.Flip(spriteLow);
+                    spriteHigh = BitMagic.Flip(spriteHigh);
+                }
+
+                spriteShiftLow[i] = spriteLow;
+                spriteShiftHigh[i] = spriteHigh;
+            }
+        }
+
+        private void UpdateSpriteShiftRegisters()
+        {
+            if(maskRegister.ShowSprites && cycle >= 1 && cycle <= 256)
+            {
+                for(int i = 0; i < spritesNumber; ++i)
+                {
+                    var sprite = currentScanlineSprites[i];
+
+                    if(sprite.X > 0)
+                    {
+                        sprite.X--;
+                    }
+                    else
+                    {
+                        spriteShiftLow[i] <<= 1;
+                        spriteShiftHigh[i] <<= 1;
+                    }
+                }
             }
         }
 
