@@ -74,6 +74,9 @@ namespace NesLib.Devices.PpuEntities
         private byte[] spriteShiftHigh = new byte[8];
         private int spritesNumber = 0;
 
+        private bool spriteZeroSelected = false;
+        private bool spriteZeroRendered = false;
+
         public bool FrameComplete { get; set; } = false;
 
         public Ppu(Nes nes)
@@ -115,6 +118,9 @@ namespace NesLib.Devices.PpuEntities
             {
                 currentScanlineSprites[i] = new ObjectAttributeEntry();
             }
+
+            spriteZeroSelected = false;
+            spriteZeroRendered = false;
         }
 
         public void ConnectCartridge(Cartridge cartridge)
@@ -297,6 +303,7 @@ namespace NesLib.Devices.PpuEntities
 
                     statusRegister.SpriteOverflow = false;
 
+                    statusRegister.SpriteZeroHit = false;
                 }
             }
 
@@ -403,6 +410,8 @@ namespace NesLib.Devices.PpuEntities
             bool fgPriority = false;
             if (maskRegister.ShowSprites)
             {
+                spriteZeroRendered = false;
+
                 for (int i = 0; i < currentScanlineSprites.Length; ++i)
                 {
                     var sprite = currentScanlineSprites[i];
@@ -420,6 +429,11 @@ namespace NesLib.Devices.PpuEntities
 
                         if (fgPixel.Value != 0)
                         {
+                            if(i == 0)
+                            {
+                                spriteZeroRendered = true;
+                            }
+
                             break;
                         }
                     }
@@ -427,6 +441,28 @@ namespace NesLib.Devices.PpuEntities
             }
 
             Pixel pixel = Pixel.Pick(bgPixel, fgPixel, fgPriority);
+
+            if(spriteZeroSelected && spriteZeroRendered && bgPixel.Value > 0 && fgPixel.Value > 0)
+            {
+                if(maskRegister.ShowBackground && maskRegister.ShowSprites)
+                {
+                    if(!(maskRegister.ShowBackgroundLeft || maskRegister.ShowSpritesLeft))
+                    {
+                        // < 258 ??
+                        if(cycle >= 9 && cycle <= 256)
+                        {
+                            statusRegister.SpriteZeroHit = true;
+                        }
+                    }
+                    else
+                    {
+                        if (cycle >= 1 && cycle <= 256)
+                        {
+                            statusRegister.SpriteZeroHit = true;
+                        }
+                    }
+                }
+            }
 
             if (cycle >= 1 && cycle <= 256 && scanLine >= 0 && scanLine < 240)
             {
@@ -581,6 +617,7 @@ namespace NesLib.Devices.PpuEntities
             }
             spritesNumber = 0;
 
+            spriteZeroSelected = false;
             statusRegister.SpriteOverflow = false;
             // decide which sprites are visible on current scanline
             for (int i = 0; i < 64; ++i)
@@ -598,6 +635,12 @@ namespace NesLib.Devices.PpuEntities
 
                     // clone because we are modifying X value in each cycle
                     currentScanlineSprites[spritesNumber++] = currentSprite.Clone() as ObjectAttributeEntry;
+
+                    // sprite zero is in current scanline
+                    if (i == 0)
+                    {
+                        spriteZeroSelected = true;
+                    }
                 }
             }
         }
