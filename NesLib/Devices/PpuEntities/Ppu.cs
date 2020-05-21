@@ -33,7 +33,6 @@ namespace NesLib.Devices.PpuEntities
         // oam - sprites
         public ObjectAttributeMemory Oam = new ObjectAttributeMemory();
 
-        //public WriteableBitmap Screen = BitmapFactory.New(256, 240);
         public WriteableBitmap Screen = new WriteableBitmap(256, 240, 96, 96, PixelFormats.Bgr24, null);
 
         private byte[] pixelBuffer = new byte[3 * 256 * 240];
@@ -428,7 +427,7 @@ namespace NesLib.Devices.PpuEntities
 
                         fgPixel.Value = (byte)((fgPixelHigh << 1) | fgPixelLow);
                         fgPixel.Palette = sprite.Attributes.Palette;
-                        fgPriority = sprite.Attributes.Priority; // TODO da li treba invertovano
+                        fgPriority = sprite.Attributes.Priority;
 
                         if (fgPixel.Value != 0)
                         {
@@ -451,7 +450,6 @@ namespace NesLib.Devices.PpuEntities
                 {
                     if(!(maskRegister.ShowBackgroundLeft || maskRegister.ShowSpritesLeft))
                     {
-                        // < 258 ??
                         if(cycle >= 9 && cycle <= 256)
                         {
                             statusRegister.SpriteZeroHit = true;

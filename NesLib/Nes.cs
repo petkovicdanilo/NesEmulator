@@ -195,9 +195,12 @@ namespace NesLib
             return (UInt16)(address & PPU_MASK);
         }
 
-        public WriteableBitmap Screen()
+        public WriteableBitmap Screen
         {
-            return ppu.Screen;
+            get
+            {
+                return ppu.Screen;
+            }
         }
      }
 }
