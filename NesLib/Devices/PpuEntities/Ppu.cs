@@ -33,7 +33,10 @@ namespace NesLib.Devices.PpuEntities
         // oam - sprites
         public ObjectAttributeMemory Oam = new ObjectAttributeMemory();
 
-        public WriteableBitmap Screen = BitmapFactory.New(256, 240);
+        //public WriteableBitmap Screen = BitmapFactory.New(256, 240);
+        public WriteableBitmap Screen = new WriteableBitmap(256, 240, 96, 96, PixelFormats.Bgr24, null);
+
+        private byte[] pixelBuffer = new byte[3 * 256 * 240];
 
         private int cycle = 0;
         private int scanLine = 0;
@@ -466,7 +469,13 @@ namespace NesLib.Devices.PpuEntities
 
             if (cycle >= 1 && cycle <= 256 && scanLine >= 0 && scanLine < 240)
             {
-                Screen.SetPixel(cycle - 1, scanLine, paletteRam.PixelColor(pixel));
+                var color = paletteRam.PixelColor(pixel);
+
+                int index = 3 * (256 * scanLine + cycle - 1);
+
+                pixelBuffer[index + 0] = color.B;
+                pixelBuffer[index + 1] = color.G;
+                pixelBuffer[index + 2] = color.R;
             }
         }
 
@@ -483,6 +492,7 @@ namespace NesLib.Devices.PpuEntities
                 {
                     scanLine = -1;
                     FrameComplete = true;
+                    Screen.WritePixels(new System.Windows.Int32Rect(0, 0, 256, 240), pixelBuffer, 3 * 256, 0);
                 }
             }
         }

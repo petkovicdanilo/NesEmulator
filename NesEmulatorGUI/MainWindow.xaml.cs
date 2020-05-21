@@ -46,56 +46,7 @@ namespace NesEmulatorGUI
             RenderOptions.SetBitmapScalingMode(NesScreen, BitmapScalingMode.NearestNeighbor);
             RenderOptions.SetEdgeMode(NesScreen, EdgeMode.Aliased);
 
-            //backgroundWorker.DoWork += BackgroundWorker_DoWork;
-            //backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-            //backgroundWorker.RunWorkerAsync();
-
             CompositionTarget.Rendering += RenderNesScreen;
-        }
-
-        private void BackgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            NesScreen.Source = nes.Screen();
-            Console.Write("bla");
-        }
-
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            if (_frameCounter++ == 0)
-            {
-                // Starting timing.
-                _stopwatch.Start();
-            }
-
-            nes.controllers[0].Left = Keyboard.IsKeyDown(Key.Left);
-            nes.controllers[0].Right = Keyboard.IsKeyDown(Key.Right);
-            nes.controllers[0].Up = Keyboard.IsKeyDown(Key.Up);
-            nes.controllers[0].Down = Keyboard.IsKeyDown(Key.Down);
-
-            nes.controllers[0].Start = Keyboard.IsKeyDown(Key.Q);
-            nes.controllers[0].Select = Keyboard.IsKeyDown(Key.W);
-            nes.controllers[0].A = Keyboard.IsKeyDown(Key.A);
-            nes.controllers[0].B = Keyboard.IsKeyDown(Key.S);
-
-            do
-            //{
-            //for (int i = 0; i < 100000; ++i)
-            {
-                nes.Clock();
-            }
-            //}
-            while (!nes.FrameComplete);
-            //NesScreen.Source = nes.Screen();
-            backgroundWorker.ReportProgress(5);
-            nes.FrameComplete = false;
-
-            // Determine frame rate in fps (frames per second).
-            long frameRate = (long)(_frameCounter / this._stopwatch.Elapsed.TotalSeconds);
-            if (frameRate > 0)
-            {
-                // Update elapsed time, number of frames, and frame rate.
-
-            }
         }
 
         private int _frameCounter = 0;
@@ -119,6 +70,7 @@ namespace NesEmulatorGUI
             nes.controllers[0].A = Keyboard.IsKeyDown(Key.A);
             nes.controllers[0].B = Keyboard.IsKeyDown(Key.S);
 
+            //Stopwatch stopwatch = Stopwatch.StartNew();
             do
             //{
             //for (int i = 0; i < 100000; ++i)
@@ -127,8 +79,14 @@ namespace NesEmulatorGUI
             }
             //}
             while (!nes.FrameComplete);
+            //stopwatch.Stop();
             NesScreen.Source = nes.Screen();
             nes.FrameComplete = false;
+
+            //long timeTaken = stopwatch.ElapsedMilliseconds;
+            //int timeToSleep = (int)((1000.0 / 60) - timeTaken);
+
+            //Thread.Sleep(Math.Max(timeToSleep, 0));
 
             //if (counter == 15)
             //{
