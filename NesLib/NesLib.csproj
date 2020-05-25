@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="WindowsBase" Version="4.6.1055" />
-    <PackageReference Include="WriteableBitmapEx" Version="1.6.5" />
   </ItemGroup>
 
   <ItemGroup>
