@@ -198,5 +198,13 @@ namespace NesLib
                 return ppu.PixelBuffer;
             }
         }
+
+        public string GameName
+        {
+            get
+            {
+                return cartridge.GameName;
+            }
+        }
      }
 }

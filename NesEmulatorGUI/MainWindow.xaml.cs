@@ -28,9 +28,6 @@ namespace NesEmulatorGUI
         private Controller controller1 = new Controller();
         private Controller controller2 = new Controller();
 
-        private string currentGame = "";
-
-
         public MainWindow()
         {
             InitializeComponent();
@@ -42,8 +39,7 @@ namespace NesEmulatorGUI
             nes.InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\Super Mario Bros. (World).nes");
             nesResetEvent.Set();
             nesRunning = true;
-            currentGame = "Super Mario Bros. (World)";
-            Title = currentGame;
+            UpdateWindowTitle();
             // **
 
             RenderOptions.SetBitmapScalingMode(NesScreen, BitmapScalingMode.NearestNeighbor);
@@ -224,8 +220,7 @@ namespace NesEmulatorGUI
             if(dialog.ShowDialog() == true)
             {
                 nes.InsertCartridge(dialog.FileName);
-                currentGame = Path.GetFileNameWithoutExtension(dialog.FileName);
-                Title = currentGame;
+                UpdateWindowTitle();
             }
 
             NesResume();
@@ -249,6 +244,8 @@ namespace NesEmulatorGUI
                     // Reattach controllers
                     nes.controllers[0] = controller1;
                     nes.controllers[1] = controller2;
+
+                    UpdateWindowTitle();
                 }
             }
 
@@ -263,7 +260,7 @@ namespace NesEmulatorGUI
             dialog.DefaultExt = ".state";
             dialog.Filter = "NES save state (*.state)|*.state";
             dialog.Title = "Save emulator state";
-            dialog.FileName = $"{currentGame} {DateTime.Now.ToString("yyyy-MM-dd HH-MM-ss")}.state";
+            dialog.FileName = $"{nes.GameName} {DateTime.Now.ToString("yyyy-MM-dd HH-MM-ss")}.state";
 
             if(dialog.ShowDialog() == true)
             {
@@ -314,7 +311,7 @@ namespace NesEmulatorGUI
             dialog.DefaultExt = ".png";
             dialog.Filter = "NES screenshot (*.png)|*.png";
             dialog.Title = "Save screenshot as";
-            dialog.FileName = $"{currentGame} {DateTime.Now.ToString("yyyy-MM-dd HH-MM-ss")}.png";
+            dialog.FileName = $"{nes.GameName} {DateTime.Now.ToString("yyyy-MM-dd HH-MM-ss")}.png";
 
             if (dialog.ShowDialog() == true)
             {
@@ -380,6 +377,12 @@ namespace NesEmulatorGUI
         {
             nesResetEvent.Set();
             nesRunning = true;
+        }
+
+        // TODO solve with binding
+        private void UpdateWindowTitle()
+        {
+            Title = nes.GameName;
         }
     }
 }

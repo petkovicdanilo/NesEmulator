@@ -20,8 +20,11 @@ namespace NesLib.Devices.CartridgeEntities
             VERTICAL
         };
 
+        public string GameName { get; private set; }
+
         public Cartridge(string filePath)
         {
+            GameName = "";
             try
             {
                 using (FileStream fs = new FileStream(filePath, 
@@ -32,6 +35,8 @@ namespace NesLib.Devices.CartridgeEntities
                     fs.Read(prgMemory, 0, prgMemory.Length);
                     fs.Read(chrMemory, 0, chrMemory.Length);
                 }
+
+                GameName = Path.GetFileNameWithoutExtension(filePath);
             }
             catch (FileNotFoundException ioEx)
             {
