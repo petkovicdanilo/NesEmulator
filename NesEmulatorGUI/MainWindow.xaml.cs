@@ -133,6 +133,7 @@ namespace NesEmulatorGUI
             });
         }
 
+        #region Controller input
         private void UpdateControllers(Key key, bool value)
         {
             switch (key)
@@ -200,6 +201,7 @@ namespace NesEmulatorGUI
         {
             UpdateControllers(e.Key, false);
         }
+        #endregion
 
         #region Menu items
 
@@ -293,16 +295,5 @@ namespace NesEmulatorGUI
         #endregion
 
         #endregion
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        { 
-            nesResetEvent.Reset();
-            //MessageBox.Show(sender.ToString());
-        }
-        private void MenuItem_Click1(object sender, RoutedEventArgs e)
-        {
-            nesResetEvent.Set();
-            //MessageBox.Show(sender.ToString());
-        }
     }
 }
