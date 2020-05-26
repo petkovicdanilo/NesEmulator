@@ -53,15 +53,14 @@ namespace NesLib
             this.cpu = new Cpu(this);
             this.ppu = new Ppu(this);
 
-            InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\Donkey Kong (World) (Rev A).nes");
-            Reset();
-
+            InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\Super Mario Bros. (World).nes");
         }
 
         public void InsertCartridge(string filePath)
         {
             cartridge = new Cartridge(filePath);
             ppu.ConnectCartridge(cartridge);
+            Reset();
         }
 
         public byte CpuRead(UInt16 address, bool debugMode = false)

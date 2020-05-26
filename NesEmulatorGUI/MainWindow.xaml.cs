@@ -18,10 +18,10 @@ namespace NesEmulatorGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Nes nes;
-
         private Thread nesThread;
         private WriteableBitmap nesScreenBitmap;
+        private ManualResetEvent nesResetEvent = new ManualResetEvent(true);
+        private bool nesRunning = true;
 
         private Controller controller1 = new Controller();
         private Controller controller2 = new Controller();
@@ -29,8 +29,6 @@ namespace NesEmulatorGUI
         public MainWindow()
         {
             InitializeComponent();
-            nes = new Nes();
-
             //AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
 
             RenderOptions.SetBitmapScalingMode(NesScreen, BitmapScalingMode.NearestNeighbor);
@@ -62,6 +60,8 @@ namespace NesEmulatorGUI
 
         private void RunNes()
         {
+            Nes nes = new Nes();
+
             nes.controllers[0] = controller1;
             nes.controllers[1] = controller2;
 
@@ -69,11 +69,12 @@ namespace NesEmulatorGUI
             long previousFrameTime = 0;
             while (true)
             {
+                nesResetEvent.WaitOne();
                 stopwatch.Stop();
                 long currentTime = stopwatch.ElapsedMilliseconds;
                 stopwatch.Start();
 
-                if(currentTime - previousFrameTime < 12)
+                if(currentTime - previousFrameTime < 16)
                 {
                     continue;
                 }
@@ -88,11 +89,11 @@ namespace NesEmulatorGUI
                 while (!nes.FrameComplete);
                 nes.FrameComplete = false;
 
-                DrawNesScreen();  
+                DrawNesScreen(nes);  
             }
         }
 
-        private void DrawNesScreen()
+        private void DrawNesScreen(Nes nes)
         {
             long backBufferStride = 4 * 256;
             long pBackBuffer = 0;
@@ -192,6 +193,97 @@ namespace NesEmulatorGUI
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
             UpdateControllers(e.Key, false);
+        }
+
+        #region Menu items
+
+        #region File
+        private void LoadGameCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            
+        }
+
+        private void LoadStateCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        private void SaveStateCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        private void ExitCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+        #endregion
+
+        #region Game
+        private void ResumeCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            nesResetEvent.Set();
+            nesRunning = true;
+
+            CommandManager.InvalidateRequerySuggested();
+        }
+
+        private void ResumeCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !nesRunning;
+        }
+
+        private void PauseCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            nesResetEvent.Reset();
+            nesRunning = false;
+        }
+        private void PauseCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = nesRunning;
+        }
+
+        private void ResetCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            
+        }
+
+        private void ScreenshotCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region Settings
+        private void InputSettingsCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+
+        private void WindowSettingsCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region Help
+        private void AboutCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+
+        }
+        #endregion
+
+        #endregion
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        { 
+            nesResetEvent.Reset();
+            //MessageBox.Show(sender.ToString());
+        }
+        private void MenuItem_Click1(object sender, RoutedEventArgs e)
+        {
+            nesResetEvent.Set();
+            //MessageBox.Show(sender.ToString());
         }
     }
 }
