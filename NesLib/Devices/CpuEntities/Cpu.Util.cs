@@ -39,6 +39,7 @@ namespace NesLib.Devices.CpuEntities
 
         private delegate bool Instruction();
 
+        [Serializable]
         private class Operation
         {
             public Instruction Instruction;

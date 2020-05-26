@@ -5,6 +5,7 @@ using System.Text;
 
 namespace NesLib.Devices
 {
+    [Serializable]
     public class Controller
     {
         private byte _state = 0x00;

@@ -4,11 +4,10 @@ using NesLib.Devices.CpuEntities;
 using NesLib.Devices.PpuEntities;
 using NesLib.Utils;
 using System;
-using System.Collections.Generic;
-using System.Windows.Media.Imaging;
 
 namespace NesLib
 {
+    [Serializable]
     public class Nes
     {
         private Cpu cpu;
@@ -51,7 +50,7 @@ namespace NesLib
         public Nes()
         {
             this.cpu = new Cpu(this);
-            this.ppu = new Ppu(this);
+            this.ppu = new Ppu();
         }
 
         public void InsertCartridge(string filePath)

@@ -5,6 +5,7 @@ using System.Text;
 
 namespace NesLib.Devices.PpuEntities.OAM
 {
+    [Serializable]
     public class Attributes: ICloneable
     {
         private byte _register;

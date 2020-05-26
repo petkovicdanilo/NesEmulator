@@ -4,6 +4,7 @@ using System.Text;
 
 namespace NesLib.Devices
 {
+    [Serializable]
     public abstract class AbstractRegister
     {
         protected byte _register;

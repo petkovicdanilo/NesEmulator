@@ -4,6 +4,7 @@ using System.Text;
 
 namespace NesLib.Devices.CartridgeEntities.Mappers
 {
+    [Serializable]
     public abstract class Mapper
     {
         protected int prgBanks, chrBanks;

@@ -4,6 +4,7 @@ using System.Text;
 
 namespace NesLib.Devices.PpuEntities.OAM
 {
+    [Serializable]
     public class ObjectAttributeMemory
     {
         private ObjectAttributeEntry[] entries = new ObjectAttributeEntry[64];

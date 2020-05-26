@@ -5,6 +5,7 @@ using System.Text;
 
 namespace NesLib.Devices.PpuEntities
 {
+    [Serializable]
     public class PaletteRam
     {
         private byte[] palette = new byte[32];

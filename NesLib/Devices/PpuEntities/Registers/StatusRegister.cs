@@ -6,6 +6,7 @@ using System.Text;
 
 namespace NesLib.Devices.PpuEntities.Registers
 {
+    [Serializable]
     public class StatusRegister : AbstractRegister
     {
         public bool VerticalBlank

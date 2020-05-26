@@ -4,6 +4,7 @@ using System.IO;
 
 namespace NesLib.Devices.CartridgeEntities
 {
+    [Serializable]
     public class Cartridge : ICpuBusDevice, IPpuBusDevice
     {
         private Mapper mapper;

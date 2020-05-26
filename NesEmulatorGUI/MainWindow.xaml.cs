@@ -9,6 +9,8 @@ using System.Diagnostics;
 using System.IO;
 using NesLib.Devices;
 using Microsoft.Win32;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace NesEmulatorGUI
 {
@@ -213,8 +215,7 @@ namespace NesEmulatorGUI
         #region File
         private void LoadGameCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            // Pause game
-            nesResetEvent.Reset();
+            NesPause();
 
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.DefaultExt = ".nes";
@@ -227,18 +228,53 @@ namespace NesEmulatorGUI
                 Title = currentGame;
             }
 
-            // Unpause game
-            nesResetEvent.Set();
+            NesResume();
         }
 
         private void LoadStateCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
+            NesPause();
 
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.DefaultExt = ".state";
+            dialog.Filter = "NES save state (*.state)|*.state";
+
+            if(dialog.ShowDialog() == true)
+            {
+                IFormatter formatter = new BinaryFormatter();
+                using (var fileStream = new FileStream(dialog.FileName, FileMode.Open))
+                {
+                    nes = formatter.Deserialize(fileStream) as Nes;
+
+                    // Reattach controllers
+                    nes.controllers[0] = controller1;
+                    nes.controllers[1] = controller2;
+                }
+            }
+
+            NesResume();
         }
 
         private void SaveStateCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
+            NesPause();
 
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.DefaultExt = ".state";
+            dialog.Filter = "NES save state (*.state)|*.state";
+            dialog.Title = "Save emulator state";
+            dialog.FileName = $"{currentGame} {DateTime.Now.ToString("yyyy-MM-dd HH-MM-ss")}.state";
+
+            if(dialog.ShowDialog() == true)
+            {
+                using (var fileStream = new FileStream(dialog.FileName, FileMode.Create))
+                {
+                    IFormatter formatter = new BinaryFormatter();
+                    formatter.Serialize(fileStream, nes);
+                }
+            }
+
+            NesResume();
         }
 
         private void ExitCommandExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -250,10 +286,7 @@ namespace NesEmulatorGUI
         #region Game
         private void ResumeCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            nesResetEvent.Set();
-            nesRunning = true;
-
-            CommandManager.InvalidateRequerySuggested();
+            NesResume();
         }
 
         private void ResumeCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -263,8 +296,7 @@ namespace NesEmulatorGUI
 
         private void PauseCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            nesResetEvent.Reset();
-            nesRunning = false;
+            NesPause();
         }
         private void PauseCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -286,8 +318,7 @@ namespace NesEmulatorGUI
 
             if (dialog.ShowDialog() == true)
             {
-                // Pause emulation
-                nesResetEvent.Reset();
+                NesPause();
 
                 RenderTargetBitmap renderTargetBitmap = new RenderTargetBitmap
                 (
@@ -308,8 +339,7 @@ namespace NesEmulatorGUI
                     encoder.Save(fileStream);
                 }
 
-                // Unpause emulation
-                nesResetEvent.Set();
+                NesResume();
             }
 
         }
@@ -339,5 +369,17 @@ namespace NesEmulatorGUI
         #endregion
 
         #endregion
+
+        private void NesPause()
+        {
+            nesResetEvent.Reset();
+            nesRunning = false;
+        }
+
+        private void NesResume()
+        {
+            nesResetEvent.Set();
+            nesRunning = true;
+        }
     }
 }

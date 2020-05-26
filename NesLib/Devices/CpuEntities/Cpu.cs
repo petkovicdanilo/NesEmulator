@@ -7,6 +7,7 @@ using System.Reflection;
 
 namespace NesLib.Devices.CpuEntities
 {
+    [Serializable]
     public partial class Cpu : IClockDevice, ICpuBusDevice
     {
         // accumulator

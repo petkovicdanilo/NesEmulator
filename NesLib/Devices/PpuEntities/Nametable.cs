@@ -5,6 +5,7 @@ using System.Text;
 
 namespace NesLib.Devices.PpuEntities
 {
+    [Serializable]
     public class Nametable
     {
         private byte[,] nameTable = new byte[2, 1024];

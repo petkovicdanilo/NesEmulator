@@ -12,10 +12,9 @@ using System.Windows.Media.Imaging;
 
 namespace NesLib.Devices.PpuEntities
 {
+    [Serializable]
     public class Ppu : IClockDevice, ICpuBusDevice, IPpuBusDevice
     {
-        private Nes nes;
-
         private Cartridge cartridge;
 
         private StatusRegister statusRegister = new StatusRegister();
@@ -79,10 +78,8 @@ namespace NesLib.Devices.PpuEntities
 
         public bool FrameComplete { get; set; } = false;
 
-        public Ppu(Nes nes)
+        public Ppu()
         {
-            this.nes = nes;
-
             for(int i = 0; i < 8; ++i)
             {
                 currentScanlineSprites[i] = new ObjectAttributeEntry();

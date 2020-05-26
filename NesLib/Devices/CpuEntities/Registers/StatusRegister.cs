@@ -1,8 +1,10 @@
 ﻿using NesLib.Devices;
 using NesLib.Utils;
+using System;
 
 namespace NesLib.Devices.CpuEntities.Registers
 {
+    [Serializable]
     public class StatusRegister : AbstractRegister
     {
         // C

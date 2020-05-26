@@ -4,6 +4,7 @@ using System.Text;
 
 namespace NesLib.Devices.CartridgeEntities.Mappers
 {
+    [Serializable]
     public class Mapper000 : Mapper
     {
         private const UInt16 PRG_LEFT = 0x8000;

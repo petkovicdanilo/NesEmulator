@@ -5,6 +5,7 @@ using System.Text;
 
 namespace NesLib.Devices.PpuEntities.Registers
 {
+    [Serializable]
     public class LoopyRegister
     {
         private UInt16 _register;

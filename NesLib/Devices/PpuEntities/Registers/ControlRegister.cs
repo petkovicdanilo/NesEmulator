@@ -6,9 +6,9 @@ using System.Text;
 
 namespace NesLib.Devices.PpuEntities.Registers
 {
+    [Serializable]
     public class ControlRegister : AbstractRegister
     {
-
         public bool EnableNmi
         {
             get

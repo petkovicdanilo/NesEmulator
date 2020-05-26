@@ -4,6 +4,7 @@ using System.Text;
 
 namespace NesLib.Devices.PpuEntities.OAM
 {
+    [Serializable]
     public class ObjectAttributeEntry : ICloneable
     {
         public byte Y { get; set; }

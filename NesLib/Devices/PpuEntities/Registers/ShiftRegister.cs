@@ -4,6 +4,7 @@ using System.Text;
 
 namespace NesLib.Devices.PpuEntities.Registers
 {
+    [Serializable]
     public class ShiftRegister
     {
         public UInt16 Register { get; set; }
