@@ -10,6 +10,7 @@ using System.IO;
 using NesLib.Devices;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.Win32;
 
 namespace NesEmulatorGUI
 {
@@ -18,10 +19,11 @@ namespace NesEmulatorGUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Nes nes;
         private Thread nesThread;
         private WriteableBitmap nesScreenBitmap;
-        private ManualResetEvent nesResetEvent = new ManualResetEvent(true);
-        private bool nesRunning = true;
+        private ManualResetEvent nesResetEvent = new ManualResetEvent(false);
+        private bool nesRunning = false;
 
         private Controller controller1 = new Controller();
         private Controller controller2 = new Controller();
@@ -30,6 +32,12 @@ namespace NesEmulatorGUI
         {
             InitializeComponent();
             //AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
+
+            nes = new Nes();
+            // DEBUG ONLY
+            nes.InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\Super Mario Bros. (World).nes");
+            nesResetEvent.Set();
+            nesRunning = true;
 
             RenderOptions.SetBitmapScalingMode(NesScreen, BitmapScalingMode.NearestNeighbor);
             RenderOptions.SetEdgeMode(NesScreen, EdgeMode.Aliased);
@@ -60,8 +68,6 @@ namespace NesEmulatorGUI
 
         private void RunNes()
         {
-            Nes nes = new Nes();
-
             nes.controllers[0] = controller1;
             nes.controllers[1] = controller2;
 
@@ -89,11 +95,11 @@ namespace NesEmulatorGUI
                 while (!nes.FrameComplete);
                 nes.FrameComplete = false;
 
-                DrawNesScreen(nes);  
+                DrawNesScreen();  
             }
         }
 
-        private void DrawNesScreen(Nes nes)
+        private void DrawNesScreen()
         {
             long backBufferStride = 4 * 256;
             long pBackBuffer = 0;
@@ -200,7 +206,20 @@ namespace NesEmulatorGUI
         #region File
         private void LoadGameCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            
+            // Pause game
+            nesResetEvent.Reset();
+
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.DefaultExt = ".nes";
+            dialog.Filter = "NES game images (*.nes)|*.nes";
+
+            if(dialog.ShowDialog() == true)
+            {
+                nes.InsertCartridge(dialog.FileName);
+            }
+
+            // Unpause game
+            nesResetEvent.Set();
         }
 
         private void LoadStateCommandExecuted(object sender, ExecutedRoutedEventArgs e)

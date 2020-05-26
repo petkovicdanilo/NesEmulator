@@ -52,8 +52,6 @@ namespace NesLib
         {
             this.cpu = new Cpu(this);
             this.ppu = new Ppu(this);
-
-            InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\Super Mario Bros. (World).nes");
         }
 
         public void InsertCartridge(string filePath)
