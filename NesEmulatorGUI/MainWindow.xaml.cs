@@ -8,8 +8,6 @@ using System.Windows.Media.Imaging;
 using System.Diagnostics;
 using System.IO;
 using NesLib.Devices;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using Microsoft.Win32;
 
 namespace NesEmulatorGUI
@@ -28,6 +26,9 @@ namespace NesEmulatorGUI
         private Controller controller1 = new Controller();
         private Controller controller2 = new Controller();
 
+        private string currentGame = "";
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -35,9 +36,13 @@ namespace NesEmulatorGUI
 
             nes = new Nes();
             // DEBUG ONLY
+            // **
             nes.InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\Super Mario Bros. (World).nes");
             nesResetEvent.Set();
             nesRunning = true;
+            currentGame = "Super Mario Bros. (World)";
+            Title = currentGame;
+            // **
 
             RenderOptions.SetBitmapScalingMode(NesScreen, BitmapScalingMode.NearestNeighbor);
             RenderOptions.SetEdgeMode(NesScreen, EdgeMode.Aliased);
@@ -218,6 +223,8 @@ namespace NesEmulatorGUI
             if(dialog.ShowDialog() == true)
             {
                 nes.InsertCartridge(dialog.FileName);
+                currentGame = Path.GetFileNameWithoutExtension(dialog.FileName);
+                Title = currentGame;
             }
 
             // Unpause game
@@ -266,12 +273,49 @@ namespace NesEmulatorGUI
 
         private void ResetCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            
+            nes.Reset();
         }
 
         private void ScreenshotCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.DefaultExt = ".png";
+            dialog.Filter = "NES screenshot (*.png)|*.png";
+            dialog.Title = "Save screenshot as";
+            dialog.FileName = $"{currentGame} {DateTime.Now.ToString("yyyy-MM-dd HH-MM-ss")}.png";
 
+            if (dialog.ShowDialog() == true)
+            {
+                // Pause emulation
+                nesResetEvent.Reset();
+
+                RenderTargetBitmap renderTargetBitmap = new RenderTargetBitmap
+                (
+                    (int) NesScreen.Width, 
+                    (int) NesScreen.Height, 
+                    96, 
+                    96,
+                    PixelFormats.Pbgra32
+                );
+
+                renderTargetBitmap.Render(NesScreen);
+
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(renderTargetBitmap));
+
+                using (var fileStream = new FileStream(dialog.FileName, FileMode.CreateNew))
+                {
+                    encoder.Save(fileStream);
+                }
+
+                // Unpause emulation
+                nesResetEvent.Set();
+            }
+
+        }
+        private void ScreenshotCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = nesRunning;
         }
         #endregion
 
