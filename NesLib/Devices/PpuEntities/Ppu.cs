@@ -409,7 +409,7 @@ namespace NesLib.Devices.PpuEntities
             {
                 spriteZeroRendered = false;
 
-                for (int i = 0; i < currentScanlineSprites.Length; ++i)
+                for (int i = 0; i < spritesNumber; ++i)
                 {
                     var sprite = currentScanlineSprites[i];
 
