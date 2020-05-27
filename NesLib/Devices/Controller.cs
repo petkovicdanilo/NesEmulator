@@ -109,5 +109,72 @@ namespace NesLib.Devices
                 BitMagic.SetBit(ref _state, 7, value);
             }
         }
+
+        public enum ControllerKeys
+        {
+            Up,
+            Down,
+            Left,
+            Right,
+            Select,
+            Start,
+            B,
+            A,
+        }
+
+        public bool GetKeyStatus(ControllerKeys key)
+        {
+            switch(key)
+            {
+                case ControllerKeys.Up:
+                    return Up;
+                case ControllerKeys.Down:
+                    return Down;
+                case ControllerKeys.Left:
+                    return Left;
+                case ControllerKeys.Right:
+                    return Right;
+                case ControllerKeys.Select:
+                    return Select;
+                case ControllerKeys.Start:
+                    return Start;
+                case ControllerKeys.A:
+                    return A;
+                case ControllerKeys.B:
+                    return B;
+            }
+            return false;
+        }
+
+        public void SetKeyStatus(ControllerKeys key, bool value)
+        {
+            switch (key)
+            {
+                case ControllerKeys.Up:
+                    Up = value;
+                    break;
+                case ControllerKeys.Down:
+                    Down = value;
+                    break;
+                case ControllerKeys.Left:
+                    Left = value;
+                    break;
+                case ControllerKeys.Right:
+                    Right = value;
+                    break;
+                case ControllerKeys.Select:
+                    Select = value;
+                    break;
+                case ControllerKeys.Start:
+                    Start = value;
+                    break;
+                case ControllerKeys.A:
+                    A = value;
+                    break;
+                case ControllerKeys.B:
+                    B = value;
+                    break;
+            }
+        }
     }
 }

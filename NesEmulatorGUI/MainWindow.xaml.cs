@@ -71,8 +71,8 @@ namespace NesEmulatorGUI
 
         private void RunNes()
         {
-            nes.controllers[0] = controller1;
-            nes.controllers[1] = controller2;
+            nes.controllers[0] = ControllerManager.controllers[0];
+            nes.controllers[1] = ControllerManager.controllers[1];
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             long previousFrameTime = 0;
@@ -131,73 +131,17 @@ namespace NesEmulatorGUI
             });
         }
 
+        
         #region Controller input
-        private void UpdateControllers(Key key, bool value)
-        {
-            switch (key)
-            {
-                case Key.Left:
-                    controller1.Left = value;
-                    break;
-                case Key.Right:
-                    controller1.Right = value;
-                    break;
-                case Key.Up:
-                    controller1.Up = value;
-                    break;
-                case Key.Down:
-                    controller1.Down = value;
-                    break;
-
-                case Key.Q:
-                    controller1.Start = value;
-                    break;
-                case Key.W:
-                    controller1.Select = value;
-                    break;
-                case Key.A:
-                    controller1.A = value;
-                    break;
-                case Key.B:
-                    controller1.B = value;
-                    break;
-
-                case Key.D4:
-                    controller2.Left = value;
-                    break;
-                case Key.D6:
-                    controller2.Right = value;
-                    break;
-                case Key.D8:
-                    controller2.Up = value;
-                    break;
-                case Key.D5:
-                    controller2.Down = value;
-                    break;
-
-                case Key.D7:
-                    controller2.Start = value;
-                    break;
-                case Key.D9:
-                    controller2.Select = value;
-                    break;
-                case Key.D1:
-                    controller2.A = value;
-                    break;
-                case Key.D2:
-                    controller2.B = value;
-                    break;
-            }
-        }
-
+      
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            UpdateControllers(e.Key, true);
+            ControllerManager.SetKeyPressed(e.Key, true);
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
-            UpdateControllers(e.Key, false);
+            ControllerManager.SetKeyPressed(e.Key, false);
         }
         #endregion
 
@@ -237,8 +181,8 @@ namespace NesEmulatorGUI
                     nes = formatter.Deserialize(fileStream) as Nes;
 
                     // Reattach controllers
-                    nes.controllers[0] = controller1;
-                    nes.controllers[1] = controller2;
+                    nes.controllers[0] = ControllerManager.controllers[0];
+                    nes.controllers[1] = ControllerManager.controllers[1];
 
                     UpdateWindowTitle();
                 }

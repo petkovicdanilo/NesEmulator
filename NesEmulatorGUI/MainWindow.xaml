@@ -22,7 +22,7 @@
         <CommandBinding Command="commands:GameCommands.Resume" Executed="ResumeCommandExecuted" CanExecute="ResumeCommandCanExecute"/>
         <CommandBinding Command="commands:GameCommands.Pause" Executed="PauseCommandExecuted" CanExecute="PauseCommandCanExecute"/>
         <CommandBinding Command="commands:GameCommands.Reset" Executed="ResetCommandExecuted"/>
-        <CommandBinding Command="commands:GameCommands.Screenshot" Executed="ScreenshotCommandExecuted" CanExecute="ScreenshotCommandCanExecute"/>
+        <CommandBinding Command="commands:GameCommands.Screenshot" Executed="ScreenshotCommandExecuted"/>
 
         <CommandBinding Command="commands:SettingsCommands.InputSettings" Executed="InputSettingsCommandExecuted"/>
         <CommandBinding Command="commands:SettingsCommands.WindowSettings" Executed="WindowSettingsCommandExecuted"/>
