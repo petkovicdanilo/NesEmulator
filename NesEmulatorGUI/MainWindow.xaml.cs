@@ -11,6 +11,7 @@ using NesLib.Devices;
 using Microsoft.Win32;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using NesEmulatorGUI.Windows;
 
 namespace NesEmulatorGUI
 {
@@ -242,6 +243,7 @@ namespace NesEmulatorGUI
         private void ResetCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             nes.Reset();
+            NesResume();
         }
 
         private void ScreenshotCommandExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -279,10 +281,6 @@ namespace NesEmulatorGUI
             }
 
         }
-        private void ScreenshotCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = nesRunning;
-        }
         #endregion
 
         #region Settings
@@ -300,7 +298,12 @@ namespace NesEmulatorGUI
         #region Help
         private void AboutCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
+            var aboutWindow = new AboutWindow();
+            aboutWindow.Owner = this;
 
+            NesPause();
+            aboutWindow.ShowDialog();
+            NesResume();
         }
         #endregion
 
