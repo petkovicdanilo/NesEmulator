@@ -47,6 +47,22 @@ namespace NesLib
             }
         }
 
+        public int[] PixelBuffer
+        {
+            get
+            {
+                return ppu.PixelBuffer;
+            }
+        }
+
+        public string GameName
+        {
+            get
+            {
+                return cartridge.GameName;
+            }
+        }
+
         public Nes()
         {
             this.cpu = new Cpu(this);
@@ -164,6 +180,16 @@ namespace NesLib
             clockCounter++;
         }
 
+        public void DoOneFrame()
+        {
+            do
+            {
+                Clock();
+            }
+            while (!FrameComplete);
+            FrameComplete = false;
+        }
+
         public void Reset()
         {
             cpu.Reset();
@@ -191,20 +217,5 @@ namespace NesLib
             return (UInt16)(address & PPU_MASK);
         }
 
-        public int[] PixelBuffer
-        {
-            get
-            {
-                return ppu.PixelBuffer;
-            }
-        }
-
-        public string GameName
-        {
-            get
-            {
-                return cartridge.GameName;
-            }
-        }
      }
 }

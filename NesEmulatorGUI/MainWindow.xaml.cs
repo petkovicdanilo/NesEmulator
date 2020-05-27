@@ -90,13 +90,8 @@ namespace NesEmulatorGUI
                 //timesTaken.Add(currentTime - previousFrameTime);
 
                 previousFrameTime = currentTime;
-
-                do
-                {
-                    nes.Clock();
-                }
-                while (!nes.FrameComplete);
-                nes.FrameComplete = false;
+                
+                nes.DoOneFrame();
 
                 DrawNesScreen();  
             }
