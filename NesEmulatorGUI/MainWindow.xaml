@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:NesEmulatorGUI"
         xmlns:commands="clr-namespace:NesEmulatorGUI.Commands"
         mc:Ignorable="d"
-        Title="NesEmulator"
+        Title="{Binding WindowTitle}"
         ResizeMode="CanMinimize"
         SizeToContent="WidthAndHeight"
         KeyDown="Window_KeyDown"
