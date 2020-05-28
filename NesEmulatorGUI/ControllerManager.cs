@@ -57,11 +57,26 @@ namespace NesEmulatorGUI
 
         public static void AddKeyMapping(int controllerIndex, ControllerKeys controllerKey, Key newKey)
         {
+            var controller = controllers[controllerIndex];
+
+            // remove old mapping
+            var toRemove = 
+                mappings
+                    .Where(pair => pair.Value.Controller == controller 
+                                && pair.Value.ControllerKey == controllerKey)
+                    .Select(pair => pair.Key)
+                    .ToList();
+
+            foreach (var key in toRemove)
+            {
+                mappings.Remove(key);
+            }
+            
             mappings.Add(
                 newKey, 
                 new Mapping
                 {
-                    Controller = controllers[controllerIndex],
+                    Controller = controller,
                     ControllerKey = controllerKey
                 }
             );
