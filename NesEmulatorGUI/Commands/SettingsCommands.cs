@@ -20,14 +20,14 @@ namespace NesEmulatorGUI.Commands
             }
         );
 
-        public static readonly RoutedUICommand WindowSettings = new RoutedUICommand
+        public static readonly RoutedUICommand EmulatorSettings = new RoutedUICommand
         (
-            "WindowSettings",
-            "WindowSettings",
+            "EmulatorSettings",
+            "EmulatorSettings",
             typeof(SettingsCommands),
             new InputGestureCollection()
             {
-            new KeyGesture(Key.W, ModifierKeys.Control | ModifierKeys.Shift)
+            new KeyGesture(Key.S, ModifierKeys.Control | ModifierKeys.Shift)
             }
         );
     }

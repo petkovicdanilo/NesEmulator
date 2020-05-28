@@ -25,7 +25,7 @@
         <CommandBinding Command="commands:GameCommands.Screenshot" Executed="ScreenshotCommandExecuted"/>
 
         <CommandBinding Command="commands:SettingsCommands.InputSettings" Executed="InputSettingsCommandExecuted"/>
-        <CommandBinding Command="commands:SettingsCommands.WindowSettings" Executed="WindowSettingsCommandExecuted"/>
+        <CommandBinding Command="commands:SettingsCommands.EmulatorSettings" Executed="EmulatorSettingsCommandExecuted"/>
 
         <CommandBinding Command="commands:HelpCommands.About" Executed="AboutCommandExecuted"/>
     </Window.CommandBindings>
@@ -75,8 +75,8 @@
                     Command="commands:SettingsCommands.InputSettings"
                 />
                 <MenuItem 
-                    Header="_Window settings"
-                    Command="commands:SettingsCommands.WindowSettings"
+                    Header="_Emulator settings"
+                    Command="commands:SettingsCommands.EmulatorSettings"
                 />
             </MenuItem>
             <MenuItem Header="_Help">
@@ -86,6 +86,11 @@
                 />
             </MenuItem>
         </Menu>
-        <Image x:Name="NesScreen" Stretch="Fill" Height="720" Width="768"/>
+        <Image 
+            x:Name="NesScreen" 
+            Stretch="Fill" 
+            Height="{Binding NesHeight}" 
+            Width="{Binding NesWidth}"
+        />
     </DockPanel>
 </Window>

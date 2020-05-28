@@ -12,13 +12,15 @@ using Microsoft.Win32;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using NesEmulatorGUI.Windows;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace NesEmulatorGUI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private Nes nes;
         private Thread nesThread;
@@ -29,10 +31,66 @@ namespace NesEmulatorGUI
         private Controller controller1 = new Controller();
         private Controller controller2 = new Controller();
 
+        private int _nesHeight = 720;
+        public int NesHeight
+        {
+            get
+            {
+                return _nesHeight;
+            }
+
+            set
+            {
+                _nesHeight = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int _nesWidth = 768;
+        public int NesWidth
+        {
+            get
+            {
+                return _nesWidth;
+            }
+
+            set
+            {
+                _nesWidth = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        private int _nesScale = 3;
+        public int NesScale
+        {
+            get
+            {
+                return _nesScale;
+            }
+
+            set
+            {
+                _nesScale = value;
+                NesHeight = value * 240;
+                NesWidth = value * 256;
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         public MainWindow()
         {
             InitializeComponent();
             //AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
+
+            DataContext = this;
 
             nes = new Nes();
             // DEBUG ONLY
@@ -308,9 +366,14 @@ namespace NesEmulatorGUI
 
         }
 
-        private void WindowSettingsCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        private void EmulatorSettingsCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
+            var emulatorSettingsWindow = new EmulatorSettingsWindow(this);
+            emulatorSettingsWindow.Owner = this;
 
+            NesPause();
+            emulatorSettingsWindow.ShowDialog();
+            NesResume();
         }
         #endregion
 
