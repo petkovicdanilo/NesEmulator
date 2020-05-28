@@ -179,13 +179,21 @@ namespace NesEmulatorGUI
                 IFormatter formatter = new BinaryFormatter();
                 using (var fileStream = new FileStream(dialog.FileName, FileMode.Open))
                 {
-                    nes = formatter.Deserialize(fileStream) as Nes;
+                    try
+                    {
+                        nes = formatter.Deserialize(fileStream) as Nes;
 
-                    // Reattach controllers
-                    nes.controllers[0] = ControllerManager.controllers[0];
-                    nes.controllers[1] = ControllerManager.controllers[1];
+                        // Reattach controllers
+                        nes.controllers[0] = ControllerManager.controllers[0];
+                        nes.controllers[1] = ControllerManager.controllers[1];
 
-                    UpdateWindowTitle();
+                        UpdateWindowTitle();
+                    }
+                    catch(Exception)
+                    {
+                        MessageBox.Show("Failed to load state file", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+
                 }
             }
 
@@ -197,6 +205,8 @@ namespace NesEmulatorGUI
             NesPause();
 
             SaveFileDialog dialog = new SaveFileDialog();
+            dialog.OverwritePrompt = true;
+            dialog.ValidateNames = true;
             dialog.DefaultExt = ".state";
             dialog.Filter = "NES save state (*.state)|*.state";
             dialog.Title = "Save emulator state";
@@ -207,7 +217,14 @@ namespace NesEmulatorGUI
                 using (var fileStream = new FileStream(dialog.FileName, FileMode.Create))
                 {
                     IFormatter formatter = new BinaryFormatter();
-                    formatter.Serialize(fileStream, nes);
+                    try
+                    {
+                        formatter.Serialize(fileStream, nes);
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("Failed to save state file", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
 
@@ -249,6 +266,8 @@ namespace NesEmulatorGUI
         private void ScreenshotCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             SaveFileDialog dialog = new SaveFileDialog();
+            dialog.OverwritePrompt = true;
+            dialog.ValidateNames = true;
             dialog.DefaultExt = ".png";
             dialog.Filter = "NES screenshot (*.png)|*.png";
             dialog.Title = "Save screenshot as";
