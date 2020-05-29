@@ -32,21 +32,6 @@ namespace NesEmulatorGUI
         private Controller controller1 = new Controller();
         private Controller controller2 = new Controller();
 
-        private string _windowTitle = "NesEmulator";
-        public string WindowTitle
-        {
-            get
-            {
-                return _windowTitle;
-            }
-
-            set
-            {
-                _windowTitle = value;
-                OnPropertyChanged();
-            }
-        }
-
         private int _nesHeight = 720;
         public int NesHeight
         {
@@ -428,7 +413,7 @@ namespace NesEmulatorGUI
 
         private void UpdateWindowTitle()
         {
-            WindowTitle = nes.GameName;
+            Title = nes.GameName;
         }
     }
 }
