@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         Title="Emulator Settings" Height="220" Width="250"
         FontSize="16"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <local:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
     </Window.Resources>
@@ -47,9 +48,9 @@
                 </RadioButton>
             </StackPanel>
         </GroupBox>
-        <StackPanel Orientation="Horizontal">
-            <Button Margin="5" Content="Apply" Click="Apply_Click" MaxWidth="400"/>
-            <Button Margin="5" Content="Cancel" Click="Cancel_Click" MaxWidth="400"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Margin="5" Width="70" Content="Apply" Click="Apply_Click" MaxWidth="400"/>
+            <Button Margin="5" Width="70" Content="Cancel" Click="Cancel_Click" MaxWidth="400"/>
         </StackPanel>
     </StackPanel>
 </Window>

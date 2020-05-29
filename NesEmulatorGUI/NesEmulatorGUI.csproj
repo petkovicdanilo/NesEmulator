@@ -61,6 +61,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ControllerSettings.xaml.cs">
+      <DependentUpon>ControllerSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ControllerManager.cs" />
     <Compile Include="Windows\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
@@ -69,6 +72,16 @@
       <DependentUpon>EmulatorSettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\EnumToBooleanConverter.cs" />
+    <Compile Include="Windows\InputSettingsWindow.xaml.cs">
+      <DependentUpon>InputSettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\PressKeyWindow.xaml.cs">
+      <DependentUpon>PressKeyWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Controls\ControllerSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -90,6 +103,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\EmulatorSettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\InputSettingsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\PressKeyWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

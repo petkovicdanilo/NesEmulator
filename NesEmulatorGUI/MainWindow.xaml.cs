@@ -89,7 +89,6 @@ namespace NesEmulatorGUI
         public MainWindow()
         {
             InitializeComponent();
-            //AppDomain.CurrentDomain.ProcessExit += new EventHandler(OnProcessExit);
 
             DataContext = this;
 
@@ -114,25 +113,10 @@ namespace NesEmulatorGUI
             nesThread.Start();
         }
 
-        //private static List<long> timesTaken = new List<long>();
-        //static void OnProcessExit(object sender, EventArgs e)
-        //{
-        //    using(StreamWriter sw = new StreamWriter("frameTimes.txt"))
-        //    {
-        //        foreach(var time in timesTaken)
-        //        {
-        //            sw.WriteLine(time);
-        //        }
-
-        //        sw.WriteLine("===========");
-        //        sw.WriteLine(timesTaken.FindAll(time => time != 12).Count);
-        //    }
-        //}
-
         private void RunNes()
         {
-            nes.controllers[0] = ControllerManager.controllers[0];
-            nes.controllers[1] = ControllerManager.controllers[1];
+            nes.controllers[0] = ControllerManager.Instance.Controllers[0];
+            nes.controllers[1] = ControllerManager.Instance.Controllers[1];
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             long previousFrameTime = 0;
@@ -196,12 +180,12 @@ namespace NesEmulatorGUI
       
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            ControllerManager.SetKeyPressed(e.Key, true);
+            ControllerManager.Instance.SetKeyPressed(e.Key, true);
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
-            ControllerManager.SetKeyPressed(e.Key, false);
+            ControllerManager.Instance.SetKeyPressed(e.Key, false);
         }
         #endregion
 
@@ -250,8 +234,8 @@ namespace NesEmulatorGUI
                         nes = formatter.Deserialize(fileStream) as Nes;
 
                         // Reattach controllers
-                        nes.controllers[0] = ControllerManager.controllers[0];
-                        nes.controllers[1] = ControllerManager.controllers[1];
+                        nes.controllers[0] = ControllerManager.Instance.Controllers[0];
+                        nes.controllers[1] = ControllerManager.Instance.Controllers[1];
 
                         UpdateWindowTitle();
                     }
@@ -371,7 +355,12 @@ namespace NesEmulatorGUI
         #region Settings
         private void InputSettingsCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
+            var inputSettingsWindow = new InputSettingsWindow();
+            inputSettingsWindow.Owner = this;
 
+            NesPause();
+            inputSettingsWindow.ShowDialog();
+            NesResume();
         }
 
         private void EmulatorSettingsCommandExecuted(object sender, ExecutedRoutedEventArgs e)
