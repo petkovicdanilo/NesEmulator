@@ -14,20 +14,44 @@
 >
     
     <Window.CommandBindings>
-        <CommandBinding Command="commands:FileCommands.LoadGame" Executed="LoadGameCommandExecuted"/>
-        <CommandBinding Command="commands:FileCommands.SaveState" Executed="SaveStateCommandExecuted"/>
-        <CommandBinding Command="commands:FileCommands.LoadState" Executed="LoadStateCommandExecuted"/>
-        <CommandBinding Command="commands:FileCommands.Exit" Executed="ExitCommandExecuted"/>
+        <CommandBinding 
+            Command="commands:FileCommands.LoadGame" 
+            Executed="LoadGameCommandExecuted"/>
+        <CommandBinding 
+            Command="commands:FileCommands.SaveState" 
+            Executed="SaveStateCommandExecuted"/>
+        <CommandBinding 
+            Command="commands:FileCommands.LoadState" 
+            Executed="LoadStateCommandExecuted"/>
+        <CommandBinding 
+            Command="commands:FileCommands.Exit" 
+            Executed="ExitCommandExecuted"/>
         
-        <CommandBinding Command="commands:GameCommands.Resume" Executed="ResumeCommandExecuted" CanExecute="ResumeCommandCanExecute"/>
-        <CommandBinding Command="commands:GameCommands.Pause" Executed="PauseCommandExecuted" CanExecute="PauseCommandCanExecute"/>
-        <CommandBinding Command="commands:GameCommands.Reset" Executed="ResetCommandExecuted"/>
-        <CommandBinding Command="commands:GameCommands.Screenshot" Executed="ScreenshotCommandExecuted"/>
+        <CommandBinding 
+            Command="commands:GameCommands.Resume" 
+            Executed="ResumeCommandExecuted" 
+            CanExecute="ResumeCommandCanExecute"/>
+        <CommandBinding 
+            Command="commands:GameCommands.Pause" 
+            Executed="PauseCommandExecuted" 
+            CanExecute="PauseCommandCanExecute"/>
+        <CommandBinding 
+            Command="commands:GameCommands.Reset" 
+            Executed="ResetCommandExecuted"/>
+        <CommandBinding 
+            Command="commands:GameCommands.Screenshot" 
+            Executed="ScreenshotCommandExecuted"/>
 
-        <CommandBinding Command="commands:SettingsCommands.InputSettings" Executed="InputSettingsCommandExecuted"/>
-        <CommandBinding Command="commands:SettingsCommands.EmulatorSettings" Executed="EmulatorSettingsCommandExecuted"/>
+        <CommandBinding 
+            Command="commands:SettingsCommands.InputSettings" 
+            Executed="InputSettingsCommandExecuted"/>
+        <CommandBinding 
+            Command="commands:SettingsCommands.EmulatorSettings" 
+            Executed="EmulatorSettingsCommandExecuted"/>
 
-        <CommandBinding Command="commands:HelpCommands.About" Executed="AboutCommandExecuted"/>
+        <CommandBinding 
+            Command="commands:HelpCommands.About" 
+            Executed="AboutCommandExecuted"/>
     </Window.CommandBindings>
     
     <DockPanel>
