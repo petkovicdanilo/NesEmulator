@@ -1,4 +1,5 @@
-﻿using NesLib.Devices.CartridgeEntities.Mappers;
+﻿using NesLib.Devices.CartridgeEntities.Exceptions;
+using NesLib.Devices.CartridgeEntities.Mappers;
 using System;
 using System.IO;
 
@@ -121,7 +122,7 @@ namespace NesLib.Devices.CartridgeEntities
             }
             catch(ArgumentNullException)
             {
-                // mapper not found
+                throw new MapperNotSupportedException(mapperId);
             }
         }
     }

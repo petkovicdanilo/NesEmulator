@@ -14,6 +14,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using NesEmulatorGUI.Windows;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using NesLib.Devices.CartridgeEntities.Exceptions;
 
 namespace NesEmulatorGUI
 {
@@ -232,8 +233,15 @@ namespace NesEmulatorGUI
 
             if(dialog.ShowDialog() == true)
             {
-                nes.InsertCartridge(dialog.FileName);
-                UpdateWindowTitle();
+                try
+                {
+                    nes.InsertCartridge(dialog.FileName);
+                    UpdateWindowTitle();
+                }
+                catch(MapperNotSupportedException ex)
+                {
+                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
 
             NesResume();
