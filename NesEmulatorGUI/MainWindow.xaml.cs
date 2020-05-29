@@ -32,6 +32,8 @@ namespace NesEmulatorGUI
         private Controller controller1 = new Controller();
         private Controller controller2 = new Controller();
 
+        private bool gameInserted = false;
+
         private int _nesHeight = 720;
         public int NesHeight
         {
@@ -98,6 +100,7 @@ namespace NesEmulatorGUI
             nes.InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\Super Mario Bros. (World).nes");
             nesResetEvent.Set();
             nesRunning = true;
+            gameInserted = true;
             UpdateWindowTitle();
             // **
 
@@ -131,7 +134,6 @@ namespace NesEmulatorGUI
                 {
                     continue;
                 }
-                //timesTaken.Add(currentTime - previousFrameTime);
 
                 previousFrameTime = currentTime;
                 
@@ -213,6 +215,11 @@ namespace NesEmulatorGUI
                 }
             }
 
+            if(!gameInserted)
+            {
+                gameInserted = true;
+            }
+
             NesResume();
         }
 
@@ -241,7 +248,13 @@ namespace NesEmulatorGUI
                     }
                     catch(Exception)
                     {
-                        MessageBox.Show("Failed to load state file", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show
+                        (
+                            "Failed to load state file", 
+                            "Error", 
+                            MessageBoxButton.OK, 
+                            MessageBoxImage.Error
+                        );
                     }
 
                 }
@@ -295,7 +308,7 @@ namespace NesEmulatorGUI
 
         private void ResumeCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = !nesRunning;
+            e.CanExecute = gameInserted && !nesRunning;
         }
 
         private void PauseCommandExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -304,13 +317,18 @@ namespace NesEmulatorGUI
         }
         private void PauseCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = nesRunning;
+            e.CanExecute = gameInserted && nesRunning;
         }
 
         private void ResetCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             nes.Reset();
             NesResume();
+        }
+
+        private void ResetCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = gameInserted;
         }
 
         private void ScreenshotCommandExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -348,8 +366,13 @@ namespace NesEmulatorGUI
 
                 NesResume();
             }
-
         }
+
+        private void ScreenshotCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = gameInserted;
+        }
+
         #endregion
 
         #region Settings

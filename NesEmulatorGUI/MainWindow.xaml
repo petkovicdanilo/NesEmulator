@@ -37,10 +37,12 @@
             CanExecute="PauseCommandCanExecute"/>
         <CommandBinding 
             Command="commands:GameCommands.Reset" 
-            Executed="ResetCommandExecuted"/>
+            Executed="ResetCommandExecuted"
+            CanExecute="ResetCommandCanExecute"/>
         <CommandBinding 
             Command="commands:GameCommands.Screenshot" 
-            Executed="ScreenshotCommandExecuted"/>
+            Executed="ScreenshotCommandExecuted"
+            CanExecute="ScreenshotCommandCanExecute"/>
 
         <CommandBinding 
             Command="commands:SettingsCommands.InputSettings" 
