@@ -49,8 +49,22 @@
             </StackPanel>
         </GroupBox>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Margin="5" Width="70" Content="Apply" Click="Apply_Click" MaxWidth="400"/>
-            <Button Margin="5" Width="70" Content="Cancel" Click="Cancel_Click" MaxWidth="400"/>
+            <Button 
+                Margin="5" 
+                Width="70" 
+                Content="Apply" 
+                Click="Apply_Click" 
+                MaxWidth="400"
+                FontSize="12"
+            />
+            <Button 
+                Margin="5" 
+                Width="70" 
+                Content="Cancel" 
+                Click="Cancel_Click" 
+                MaxWidth="400"
+                FontSize="12"
+            />
         </StackPanel>
     </StackPanel>
 </Window>
