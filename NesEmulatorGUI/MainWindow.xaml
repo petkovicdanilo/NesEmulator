@@ -19,7 +19,8 @@
             Executed="LoadGameCommandExecuted"/>
         <CommandBinding 
             Command="commands:FileCommands.SaveState" 
-            Executed="SaveStateCommandExecuted"/>
+            Executed="SaveStateCommandExecuted"
+            CanExecute="SaveStateCommandCanExecute"/>
         <CommandBinding 
             Command="commands:FileCommands.LoadState" 
             Executed="LoadStateCommandExecuted"/>

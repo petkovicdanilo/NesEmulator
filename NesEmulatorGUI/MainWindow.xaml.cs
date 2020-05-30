@@ -97,11 +97,11 @@ namespace NesEmulatorGUI
             nes = new Nes();
             // DEBUG ONLY
             // **
-            nes.InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\Super Mario Bros. (World).nes");
-            nesResetEvent.Set();
-            nesRunning = true;
-            gameInserted = true;
-            UpdateWindowTitle();
+            //nes.InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\Super Mario Bros. (World).nes");
+            //nesResetEvent.Set();
+            //nesRunning = true;
+            //gameInserted = true;
+            //UpdateWindowTitle();
             // **
 
             RenderOptions.SetBitmapScalingMode(NesScreen, BitmapScalingMode.NearestNeighbor);
@@ -196,47 +196,62 @@ namespace NesEmulatorGUI
         #region File
         private void LoadGameCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            NesPause();
-
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.DefaultExt = ".nes";
-            dialog.Filter = "NES game images (*.nes)|*.nes";
-
-            if(dialog.ShowDialog() == true)
+            try
             {
-                try
+                NesPause();
+
+                OpenFileDialog dialog = new OpenFileDialog();
+                dialog.DefaultExt = ".nes";
+                dialog.Filter = "NES game images (*.nes)|*.nes";
+
+                if (dialog.ShowDialog() == true)
                 {
                     nes.InsertCartridge(dialog.FileName);
                     UpdateWindowTitle();
-                }
-                catch(MapperNotSupportedException ex)
-                {
-                    MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    
+                    gameInserted = true;
                 }
             }
-
-            if(!gameInserted)
+            catch(MapperNotSupportedException ex)
             {
-                gameInserted = true;
+                MessageBox.Show
+                (
+                    ex.Message, 
+                    "Error", 
+                    MessageBoxButton.OK, 
+                    MessageBoxImage.Error
+                );
             }
-
-            NesResume();
+            catch(Exception)
+            {
+                MessageBox.Show
+                   (
+                       "Failed to load game for unknown reason",
+                       "Error",
+                       MessageBoxButton.OK,
+                       MessageBoxImage.Error
+                   );
+            }
+            finally
+            {
+                NesResume();
+            }
         }
 
         private void LoadStateCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            NesPause();
-
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.DefaultExt = ".state";
-            dialog.Filter = "NES save state (*.state)|*.state";
-
-            if(dialog.ShowDialog() == true)
+            try
             {
-                IFormatter formatter = new BinaryFormatter();
-                using (var fileStream = new FileStream(dialog.FileName, FileMode.Open))
+                NesPause();
+
+                OpenFileDialog dialog = new OpenFileDialog();
+                dialog.DefaultExt = ".state";
+                dialog.Filter = "NES save state (*.state)|*.state";
+
+                if(dialog.ShowDialog() == true)
                 {
-                    try
+                    IFormatter formatter = new BinaryFormatter();
+                    using (var fileStream = new FileStream(dialog.FileName, FileMode.Open))
                     {
                         nes = formatter.Deserialize(fileStream) as Nes;
 
@@ -245,53 +260,70 @@ namespace NesEmulatorGUI
                         nes.controllers[1] = ControllerManager.Instance.Controllers[1];
 
                         UpdateWindowTitle();
-                    }
-                    catch(Exception)
-                    {
-                        MessageBox.Show
-                        (
-                            "Failed to load state file", 
-                            "Error", 
-                            MessageBoxButton.OK, 
-                            MessageBoxImage.Error
-                        );
-                    }
 
+                        gameInserted = true;
+                    }
                 }
             }
-
-            NesResume();
+            catch (Exception)
+            {
+                MessageBox.Show
+                (
+                    "Failed to load state file",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
+            finally
+            {
+                NesResume();
+            }
         }
 
         private void SaveStateCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            NesPause();
-
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.OverwritePrompt = true;
-            dialog.ValidateNames = true;
-            dialog.DefaultExt = ".state";
-            dialog.Filter = "NES save state (*.state)|*.state";
-            dialog.Title = "Save emulator state";
-            dialog.FileName = $"{nes.GameName} {DateTime.Now.ToString("yyyy-MM-dd HH-MM-ss")}.state";
-
-            if(dialog.ShowDialog() == true)
+            try
             {
-                using (var fileStream = new FileStream(dialog.FileName, FileMode.Create))
+                NesPause();
+
+                SaveFileDialog dialog = new SaveFileDialog();
+                dialog.OverwritePrompt = true;
+                dialog.ValidateNames = true;
+                dialog.DefaultExt = ".state";
+                dialog.Filter = "NES save state (*.state)|*.state";
+                dialog.Title = "Save emulator state";
+                dialog.FileName = $"{nes.GameName} {DateTime.Now.ToString("yyyy-MM-dd HH-MM-ss")}.state";
+
+                if (dialog.ShowDialog() == true)
                 {
-                    IFormatter formatter = new BinaryFormatter();
-                    try
+                    using (var fileStream = new FileStream(dialog.FileName, FileMode.Create))
                     {
+                        IFormatter formatter = new BinaryFormatter();
                         formatter.Serialize(fileStream, nes);
                     }
-                    catch (Exception)
-                    {
-                        MessageBox.Show("Failed to save state file", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+
                 }
             }
+            catch (Exception)
+            {
+                MessageBox.Show
+                (
+                    "Failed to save state file",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error
+                );
+            }
+            finally
+            {
+                NesResume();
+            }
+        }
 
-            NesResume();
+        private void SaveStateCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = gameInserted;
         }
 
         private void ExitCommandExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -419,8 +451,11 @@ namespace NesEmulatorGUI
 
         private void NesResume()
         {
-            nesResetEvent.Set();
-            nesRunning = true;
+            if(gameInserted)
+            {
+                nesResetEvent.Set();
+                nesRunning = true;
+            }
         }
 
         private void UpdateWindowTitle()
