@@ -24,18 +24,12 @@ namespace NesEmulatorGUI.Windows
             InitializeComponent();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            ControllerManager.Instance.CreateMappingsBuffer();
-        }
-
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
             ControllerManager.Instance.SetDefaultMappings();
 
             Controller1Control.RestoreDefault();
             Controller2Control.RestoreDefault();
-
         }
 
         private void ApplyButton_Click(object sender, RoutedEventArgs e)

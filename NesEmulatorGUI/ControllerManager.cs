@@ -15,7 +15,6 @@ namespace NesEmulatorGUI
 
         private ControllerManager()
         {
-            CreateMappingsBuffer();
             SetDefaultMappings();
             FlushMappingsBuffer();
         }
@@ -27,7 +26,20 @@ namespace NesEmulatorGUI
         };
 
         public Dictionary<Key, ControllerKeyInfo> Mappings = new Dictionary<Key, ControllerKeyInfo>();
-        public Dictionary<Key, ControllerKeyInfo> MappingsBuffer;
+        private Dictionary<Key, ControllerKeyInfo> _mappingsBuffer = null;
+        public Dictionary<Key, ControllerKeyInfo> MappingsBuffer 
+        {
+            get
+            {
+                if(_mappingsBuffer == null)
+                {
+                    _mappingsBuffer = new Dictionary<Key, ControllerKeyInfo>(Mappings);
+                }
+
+                return _mappingsBuffer;
+            }
+        }
+
 
         public bool Controller2Enabled { get; set; } = true;
 
@@ -102,11 +114,6 @@ namespace NesEmulatorGUI
             );
         }
 
-        public void CreateMappingsBuffer()
-        {
-            MappingsBuffer = new Dictionary<Key, ControllerKeyInfo>(Mappings);
-        }
-
         public void FlushMappingsBuffer()
         {
             Mappings = MappingsBuffer;
@@ -115,7 +122,7 @@ namespace NesEmulatorGUI
 
         public void DestroyMappingsBuffer()
         {
-            MappingsBuffer = null;
+            _mappingsBuffer = null;
         }
     }
 }

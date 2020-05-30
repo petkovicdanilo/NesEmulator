@@ -9,7 +9,6 @@
         mc:Ignorable="d"
         Title="Input Settings" Height="500" Width="800"
         MinHeight="450" MinWidth="500"
-        Loaded="Window_Loaded"
         Closed="Window_Closed">
 
     <Grid Margin="5">
