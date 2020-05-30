@@ -7,7 +7,6 @@ using System.Threading;
 using System.Windows.Media.Imaging;
 using System.Diagnostics;
 using System.IO;
-using NesLib.Devices;
 using Microsoft.Win32;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -28,9 +27,6 @@ namespace NesEmulatorGUI
         private WriteableBitmap nesScreenBitmap;
         private ManualResetEvent nesResetEvent = new ManualResetEvent(false);
         private bool nesRunning = false;
-
-        private Controller controller1 = new Controller();
-        private Controller controller2 = new Controller();
 
         private bool gameInserted = false;
 
