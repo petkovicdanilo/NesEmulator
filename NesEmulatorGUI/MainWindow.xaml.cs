@@ -369,10 +369,10 @@ namespace NesEmulatorGUI
             dialog.Title = "Save screenshot as";
             dialog.FileName = $"{nes.GameName} {DateTime.Now.ToString("yyyy-MM-dd HH-MM-ss")}.png";
 
+            NesPause();
+
             if (dialog.ShowDialog() == true)
             {
-                NesPause();
-
                 RenderTargetBitmap renderTargetBitmap = new RenderTargetBitmap
                 (
                     (int) NesScreen.Width, 
@@ -391,9 +391,9 @@ namespace NesEmulatorGUI
                 {
                     encoder.Save(fileStream);
                 }
-
-                NesResume();
             }
+
+            NesResume();
         }
 
         private void ScreenshotCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
