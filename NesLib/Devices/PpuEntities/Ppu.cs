@@ -392,14 +392,14 @@ namespace NesLib.Devices.PpuEntities
 
                 bgPixel.Value = (byte)
                 (
-                    (((bgPatternHigh.Register & bitmask) > 0 ? 1 : 0) << 1) |
-                    ((bgPatternLow.Register & bitmask) > 0 ? 1 : 0)
+                    (((bgPatternHigh.Register & bitmask) != 0 ? 1 : 0) << 1) |
+                    ((bgPatternLow.Register & bitmask) != 0 ? 1 : 0)
                 );
 
                 bgPixel.Palette = (byte)
                 (
-                    (((bgAttributeHigh.Register & bitmask) > 0 ? 1 : 0) << 1) |
-                    ((bgAttributeLow.Register & bitmask) > 0 ? 1 : 0)
+                    (((bgAttributeHigh.Register & bitmask) != 0 ? 1 : 0) << 1) |
+                    ((bgAttributeLow.Register & bitmask) != 0 ? 1 : 0)
                 );
             }
 
@@ -565,7 +565,7 @@ namespace NesLib.Devices.PpuEntities
             UInt16 tileId = (UInt16)(bgNextTileId << 4);
             UInt16 offset = (UInt16)(vRam.FineY);
 
-            UInt16 address = (UInt16)(patternId + tileId + offset);
+            UInt16 address = (UInt16)(patternId | tileId | offset);
 
             bgNextTileLsb = PpuRead(address);
         }
@@ -579,7 +579,7 @@ namespace NesLib.Devices.PpuEntities
             UInt16 tileId = (UInt16)(bgNextTileId << 4);
             UInt16 offset = (UInt16)(vRam.FineY + 8);
 
-            UInt16 address = (UInt16)(patternId + tileId + offset);
+            UInt16 address = (UInt16)(patternId | tileId | offset);
 
             bgNextTileMsb = PpuRead(address);
         }
