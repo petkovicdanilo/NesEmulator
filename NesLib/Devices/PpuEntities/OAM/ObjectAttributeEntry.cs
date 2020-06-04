@@ -27,8 +27,8 @@ namespace NesLib.Devices.PpuEntities.OAM
                     case 3:
                         return X;
                 }
-                // TODO
-                return Y;
+                
+                return 0;
             }
 
             set
