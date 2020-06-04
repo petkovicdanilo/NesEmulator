@@ -42,24 +42,7 @@ namespace NesLib.Devices.PpuEntities
 
         private static int NametableId(UInt16 address)
         {
-            // TODO prettier
-            if (address >= 0x0000 && address <= 0x03FF)
-            {
-                return 0;
-            }
-            if (address >= 0x0400 && address <= 0x07FF)
-            {
-                return 1;
-            }
-            if (address >= 0x0800 && address <= 0x0BFF)
-            {
-                return 2;
-            }
-            if (address >= 0x0C00 && address <= 0x0FFF)
-            {
-                return 3;
-            }
-            return 0;
+            return address / 0x0400;
         }
 
         private static int MirrorNametable(UInt16 address, Cartridge.MirrorMode mirrorMode)

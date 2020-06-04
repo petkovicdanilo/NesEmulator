@@ -160,7 +160,6 @@ namespace NesLib.Devices.CpuEntities
 
                 cycles += (add1 && add2) ? 1 : 0;
                 
-                // TODO jel treba
                 Status.UnusedFlag = true;
             }
 
