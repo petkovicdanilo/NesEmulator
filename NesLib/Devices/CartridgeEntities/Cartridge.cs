@@ -107,7 +107,6 @@ namespace NesLib.Devices.CartridgeEntities
             }
         }
 
-        // TODO: handle mapper not found
         private void AddMapperFromId(int mapperId)
         {
             string mapperIdString = mapperId.ToString().PadLeft(3, '0');

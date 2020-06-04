@@ -18,7 +18,6 @@ namespace NesLib.Devices.CartridgeEntities.Mappers
 
         }
 
-        // TODO: handle invalid addresses
         public override UInt16 MapCpuRead(UInt16 address)
         {
             return MapCpu(address);
