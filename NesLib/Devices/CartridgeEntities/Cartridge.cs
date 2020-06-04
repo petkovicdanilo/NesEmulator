@@ -71,17 +71,13 @@ namespace NesLib.Devices.CartridgeEntities
 
         // TODO: 
         // - handle different file formats
-        // - mirroring
         private void ReadHeader(FileStream fs)
         {
             // discard name
             fs.Seek(4, SeekOrigin.Begin);
 
-            // check inclusive
-
             int prgRomSize = fs.ReadByte(); // num of 16kb units
             prgMemory = new byte[prgRomSize * 16 * 1024];
-
 
             int chrRomSize = fs.ReadByte(); // num of 8kb units
             chrMemory = new byte[chrRomSize * 8 * 1024];
