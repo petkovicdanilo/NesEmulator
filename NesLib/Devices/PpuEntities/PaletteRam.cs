@@ -104,7 +104,6 @@ namespace NesLib.Devices.PpuEntities
         public byte Read(UInt16 address)
         {
             address = MaskAddress(address);
-
             return palette[address];
         }
 

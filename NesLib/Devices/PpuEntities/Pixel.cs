@@ -21,14 +21,17 @@ namespace NesLib.Devices.PpuEntities
 
         public static Pixel Pick(Pixel background, Pixel foreground, bool foregroundPriority)
         {
+            if(background.Value == 0 && foreground.Value == 0)
+            {
+                return new Pixel();
+            }
+
             if (background.Value == 0 || (foreground.Value > 0 && foregroundPriority))
             {
                 return foreground;
             }
-            else
-            {
-                return background;
-            }
+
+            return background;
         }
     }
 }

@@ -416,7 +416,6 @@ namespace NesLib.Devices.PpuEntities
                     if (sprite.X == 0)
                     {
                         // we've hit the sprite
-                        // TODO out of range
                         byte fgPixelLow = (byte)(BitMagic.IsBitSet(spriteShiftLow[i], 7) ? 0x01 : 0x00);
                         byte fgPixelHigh = (byte)(BitMagic.IsBitSet(spriteShiftHigh[i], 7) ? 0x01 : 0x00);
 
