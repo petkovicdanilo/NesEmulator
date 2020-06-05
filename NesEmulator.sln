@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NesLib", "NesLib\NesLib.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NesEmulatorGUI", "NesEmulatorGUI\NesEmulatorGUI.csproj", "{326F2D65-50A1-467E-8631-41AF93BBB810}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{CA4CD280-6ECF-4DCE-B401-AC595D281B66}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,8 @@ Global
 		{326F2D65-50A1-467E-8631-41AF93BBB810}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{326F2D65-50A1-467E-8631-41AF93BBB810}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{326F2D65-50A1-467E-8631-41AF93BBB810}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA4CD280-6ECF-4DCE-B401-AC595D281B66}.Debug|Any CPU.ActiveCfg = Debug
+		{CA4CD280-6ECF-4DCE-B401-AC595D281B66}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
