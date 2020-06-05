@@ -20,12 +20,6 @@ namespace NesLib
             new Controller()
         };
 
-        private const UInt16 CPU_RAM_LEFT = 0x0000, CPU_RAM_RIGHT = 0x1FFF;
-        private const UInt16 PPU_LEFT = 0x2000, PPU_RIGHT = 0x3FFF;
-
-        private const UInt16 CPU_RAM_MASK = 0x07FF;
-        private const UInt16 PPU_MASK = 0x0007;
-
         private int clockCounter = 0;
 
         private byte[] cpuRam = new byte[2048];
@@ -86,7 +80,7 @@ namespace NesLib
             {
                 return ppu.CpuRead(MaskPpu(address), debugMode);
             }
-            else if (address >= 0x4016 && address <= 0x4017)
+            else if (InControllerRange(address))
             {
                 int index = address & 0x0001;
                 byte data = (byte)(BitMagic.IsBitSet(capturedController[index], 7) ? 0x01 : 0x00);
@@ -95,7 +89,7 @@ namespace NesLib
 
                 return data;
             }
-            else if(address >= 0x4020 && address <= 0xFFFF)
+            else if(InCartridgeRange(address))
             {
                 return cartridge.CpuRead(address);
             }
@@ -119,12 +113,12 @@ namespace NesLib
                 dmaAddress = 0x00;
                 dmaStarted = true;
             }
-            else if (address >= 0x4016 && address <= 0x4017)
+            else if (InControllerRange(address))
             {
                 int index = address & 0x0001;
                 capturedController[index] = controllers[index].State;
             }
-            else if (address >= 0x4020 && address <= 0xFFFF)
+            else if (InCartridgeRange(address))
             {
                 cartridge.CpuWrite(address, data);
             }
@@ -200,22 +194,32 @@ namespace NesLib
 
         private bool InCpuRamRange(UInt16 address)
         {
-            return (address >= CPU_RAM_LEFT && address <= CPU_RAM_RIGHT);
+            return (address >= 0x0000 && address <= 0x1FFF);
         }
 
         private bool InPpuRange(UInt16 address)
         {
-            return (address >= PPU_LEFT && address <= PPU_RIGHT);
+            return (address >= 0x2000 && address <= 0x3FFF);
+        }
+
+        private bool InControllerRange(UInt16 address)
+        {
+            return (address >= 0x4016 && address <= 0x4017);
+        }
+
+        private bool InCartridgeRange(UInt16 address)
+        {
+            return (address >= 0x4020 && address <= 0xFFFF);
         }
 
         private UInt16 MaskCpuRam(UInt16 address)
         {
-            return (UInt16)(address & CPU_RAM_MASK);
+            return (UInt16)(address & 0x07FF);
         }
 
         private UInt16 MaskPpu(UInt16 address)
         {
-            return (UInt16)(address & PPU_MASK);
+            return (UInt16)(address & 0x0007);
         }
 
      }
