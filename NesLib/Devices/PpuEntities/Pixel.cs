@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace NesLib.Devices.PpuEntities
+﻿namespace NesLib.Devices.PpuEntities
 {
     public class Pixel
     {

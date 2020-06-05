@@ -1,5 +1,4 @@
-﻿using NesLib.Devices;
-using NesLib.Utils;
+﻿using NesLib.Utils;
 using System;
 
 namespace NesLib.Devices.CpuEntities.Registers

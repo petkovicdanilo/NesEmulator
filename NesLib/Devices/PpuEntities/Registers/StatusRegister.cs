@@ -1,8 +1,5 @@
-﻿using NesLib.Devices;
-using NesLib.Utils;
+﻿using NesLib.Utils;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NesLib.Devices.PpuEntities.Registers
 {

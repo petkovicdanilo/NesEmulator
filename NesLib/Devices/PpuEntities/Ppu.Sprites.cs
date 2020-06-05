@@ -1,8 +1,6 @@
 ﻿using NesLib.Devices.PpuEntities.OAM;
 using NesLib.Utils;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NesLib.Devices.PpuEntities
 {

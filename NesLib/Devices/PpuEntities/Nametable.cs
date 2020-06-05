@@ -1,7 +1,5 @@
 ﻿using NesLib.Devices.CartridgeEntities;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace NesLib.Devices.PpuEntities
 {
