@@ -1,5 +1,6 @@
 ﻿using NesLib.Devices.CartridgeEntities.Exceptions;
 using NesLib.Devices.CartridgeEntities.Mappers;
+using NesLib.Utils;
 using System;
 using System.IO;
 
@@ -22,6 +23,8 @@ namespace NesLib.Devices.CartridgeEntities
         };
 
         public string GameName { get; private set; }
+
+        private bool usingChrRam = false;
 
         public Cartridge(string filePath)
         {
@@ -80,7 +83,15 @@ namespace NesLib.Devices.CartridgeEntities
             prgMemory = new byte[prgRomSize * 16 * 1024];
 
             int chrRomSize = fs.ReadByte(); // num of 8kb units
-            chrMemory = new byte[chrRomSize * 8 * 1024];
+            if(chrRomSize == 0)
+            {
+                usingChrRam = true;
+                chrMemory = new byte[8 * 1024];
+            }
+            else
+            {
+                chrMemory = new byte[chrRomSize * 8 * 1024];
+            }
 
             int flags6 = (byte)fs.ReadByte();
             int flags7 = (byte)fs.ReadByte();
@@ -93,9 +104,9 @@ namespace NesLib.Devices.CartridgeEntities
             int mapperId = (flags7 & 0xF0) | ((flags6 & 0xF0) >> 4);
             AddMapperFromId(mapperId);
 
-            Mode = (flags6 & (1 << 0)) == 0 ? MirrorMode.HORIZONTAL : MirrorMode.VERTICAL;
+            Mode = BitMagic.IsBitSet((byte) flags6, 0) ? MirrorMode.VERTICAL : MirrorMode.HORIZONTAL;
 
-            bool hasTrainer = (flags6 & (1 << 2)) != 0;
+            bool hasTrainer = BitMagic.IsBitSet((byte) flags6, 2);
 
             if(hasTrainer)
             {
@@ -107,11 +118,12 @@ namespace NesLib.Devices.CartridgeEntities
         {
             string mapperIdString = mapperId.ToString().PadLeft(3, '0');
 
-            var objectType = Type.GetType($"NesLib.Devices.CartridgeEntities.Mappers.Mapper{mapperIdString}");
+            var objectType = 
+                Type.GetType($"NesLib.Devices.CartridgeEntities.Mappers.Mapper{mapperIdString}");
             try
             {
                 int prgBanks = prgMemory.Length / (16 * 1024);
-                int chrBanks = chrMemory.Length / (8 * 1024);
+                int chrBanks = usingChrRam ? 0 : chrMemory.Length / (8 * 1024);
 
                 mapper = Activator.CreateInstance(objectType, prgBanks, chrBanks) as Mapper;
             }
