@@ -48,28 +48,57 @@ namespace NesLib.Devices.CartridgeEntities
             }
         }
 
-        public byte CpuRead(ushort address, bool debugMode = false)
+        public byte CpuRead(UInt16 address, bool debugMode = false)
         {
-            UInt16 mappedAddress = mapper.MapCpuRead(address);
-            return prgMemory[mappedAddress];
+            UInt16 mappedAddress = 0;
+            byte data = 0;
+
+            if(mapper.MapCpuRead(address, ref mappedAddress))
+            {
+                data = prgMemory[mappedAddress];
+            }
+
+            return data;
         }
 
-        public void CpuWrite(ushort address, byte data)
+        public void CpuWrite(UInt16 address, byte data)
         {
-            UInt16 mappedAddress = mapper.MapCpuWrite(address);
-            prgMemory[mappedAddress] = data;
+            UInt16 mappedAddress = 0;
+
+            if(mapper.MapCpuWrite(address, ref mappedAddress, data))
+            {
+                prgMemory[mappedAddress] = data;
+            }
         }
 
-        public byte PpuRead(ushort address)
+        public byte PpuRead(UInt16 address)
         {
-            UInt16 mappedAddress = mapper.MapPpuRead(address);
-            return chrMemory[mappedAddress];
+            UInt16 mappedAddress = 0;
+            if(mapper.MapPpuRead(address, ref mappedAddress))
+            {
+                return chrMemory[mappedAddress];
+            }
+
+            return 0;
         }
 
-        public void PpuWrite(ushort address, byte data)
+        public void PpuWrite(UInt16 address, byte data)
         {
-            UInt16 mappedAddress = mapper.MapPpuWrite(address);
-            chrMemory[mappedAddress] = data;
+            UInt16 mappedAddress = 0;
+            if(mapper.MapPpuWrite(address, ref mappedAddress))
+            {
+                chrMemory[mappedAddress] = data;
+            }
+        }
+
+        public void Reset()
+        {
+            if (mapper != null)
+            {
+                mapper.Reset();
+            }
+
+            usingChrRam = false;
         }
 
         // TODO: 

@@ -194,6 +194,7 @@ namespace NesLib
         {
             cpu.Reset();
             ppu.Reset();
+            cartridge.Reset();
             clockCounter = 0;
         }
 

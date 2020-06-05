@@ -15,11 +15,13 @@ namespace NesLib.Devices.CartridgeEntities.Mappers
             this.chrBanks = chrBanks;
         }
 
-        public abstract UInt16 MapCpuRead(UInt16 address);
-        public abstract UInt16 MapCpuWrite(UInt16 address);
+        // Read/Write methods return boolean to check if they populated mappedAddress
+        public abstract bool MapCpuRead(UInt16 address, ref UInt16 mappedAddress);
+        public abstract bool MapCpuWrite(UInt16 address, ref UInt16 mappedAddress, byte data);
 
+        public abstract bool MapPpuRead(UInt16 address, ref UInt16 mappedAddress);
+        public abstract bool MapPpuWrite(UInt16 address, ref UInt16 mappedAddress);
 
-        public abstract UInt16 MapPpuRead(UInt16 address);
-        public abstract UInt16 MapPpuWrite(UInt16 address);
+        public abstract void Reset();
     }
 }
