@@ -91,14 +91,6 @@ namespace NesEmulatorGUI
             DataContext = this;
 
             nes = new Nes();
-            // DEBUG ONLY
-            // **
-            //nes.InsertCartridge(@"C:\Users\Danilo\Desktop\NES games\Super Mario Bros. (World).nes");
-            //nesResetEvent.Set();
-            //nesRunning = true;
-            //gameInserted = true;
-            //UpdateWindowTitle();
-            // **
 
             RenderOptions.SetBitmapScalingMode(NesScreen, BitmapScalingMode.NearestNeighbor);
             RenderOptions.SetEdgeMode(NesScreen, EdgeMode.Aliased);
